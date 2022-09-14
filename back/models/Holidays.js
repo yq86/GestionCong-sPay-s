@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
     const Holidays = sequelize.define("Holidays", {
         idUser: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: false,
             autoIncrement: false,
             primaryKey: true,
             references: {
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         holidaysAvailable: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             allowNull: true,
         },
         holidaysTaken: {
