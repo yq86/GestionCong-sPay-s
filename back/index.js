@@ -12,8 +12,10 @@ app.get('/', (req, res)=>{
 // routers
 const usersRouter = require('./routes/users');
 const holidaysRouter = require('./routes/holidays');
+const demandesRouter = require('./routes/demandes');
 app.use('/users', usersRouter);
 app.use('/holidays', holidaysRouter);
+app.use('/demandes', demandesRouter);
 
 
 

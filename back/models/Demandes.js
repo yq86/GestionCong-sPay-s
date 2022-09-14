@@ -30,7 +30,21 @@ module.exports = (sequelize, DataTypes) => {
         status: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        description: {
+            type: DataTypes.TEXT,
+            allowNull: true
         }
     });
+
+    Demandes.associate = function (models) {
+        Demandes.hasOne(models.Types, {
+            foreignKey: {
+                name: 'idTypeKey',
+                field: 'idType',
+            },
+            as: 'Types',
+        }); 
+    }; 
     return Demandes;
 };
