@@ -4,8 +4,8 @@ const holidaysRouter =  express.Router();
 
 const holidaysCtrl = require('./controllers/holidays');
 
-holidaysRouter.post('/create', holidaysCtrl.createHolidays);
 holidaysRouter.get('/', holidaysCtrl.getAllUsersHolidays);
+holidaysRouter.get('/getById/:idUser', holidaysCtrl.getHolidayByIdUser);
 
 
 module.exports = holidaysRouter;
