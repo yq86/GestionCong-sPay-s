@@ -23,3 +23,23 @@ exports.getHolidayByIdUser = async (req, res) => {
         res.send(error);
     } 
 };
+
+exports.updateHoliday = async (req, res) => {
+    try {
+        const id = req.body.idUser;  
+        let objH = req.body;
+        delete objH.idUser;     
+        await Holidays.update(objH,{    // update user
+            where: { 
+                idUser : [id]
+            },
+            returning: true
+        }).then(async ()=>{
+            // get and return this user after being updated
+            const uh = await Holidays.findByPk(id);
+            res.json(uh); 
+        });
+    }catch (error) {
+        res.send(error);
+    } 
+};

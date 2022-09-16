@@ -1,4 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
+    try{
     const Holidays = sequelize.define("Holidays", {
         idUser: {
             type: DataTypes.INTEGER,
@@ -18,6 +19,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true
         }
+    },{
+        updatedAt: false,
+        createdAt: false
     });
     return Holidays;
+} catch (error) {
+    console.error(error);
+}  
 };

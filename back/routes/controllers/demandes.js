@@ -3,15 +3,35 @@ const express = require("express");
 const { response } = require('../../app');
 const router = express.Router();
 const { Demandes } = require("../../models");
+const { Holidays } = require("../../models");
 // to create demande
 exports.createDemande = async (req, res) => {
     try{
         const demande = req.body;
-        // if this user's available holidays are not 0, create demande
+        demande.status = 1;
+        const idUser = req.body.idUser;
         
-        await Demandes.create(demande).then(createdDemande=>{
-            res.json(createdDemande); // return created user
-        });    
+        // if this user's available holidays are not 0, create demande
+        const holiday = await Holidays.findByPk(idUser);
+        const date1 = new Date(demande.startingDate);
+        const date2 = new Date(demande.endingDate);
+        
+        const daysDemande = Math.ceil((date2.getTime() - date1.getTime())/ (1000 * 3600 * 24)+1);
+       // res.json(daysDemande)
+
+        
+        if(demande.idType ==1 && holiday.holidaysAvailable >= daysDemande){
+            await Demandes.create(demande).then(createdDemande=>{
+                res.json(createdDemande); // return created demande
+            }); 
+        } else if(demande.idType == 1 && holiday.holidaysAvailable < daysDemande){
+            res.json("you dont have available holidays");
+        } else if(demande.idType != 1){
+            // create demande
+                await Demandes.create(demande).then(createdDemande=>{
+                    res.json(createdDemande); // return created demande 
+                }); 
+        }
     } catch (error) {
         res.send(error);
     }

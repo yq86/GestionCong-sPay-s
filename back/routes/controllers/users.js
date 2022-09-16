@@ -16,28 +16,25 @@ exports.createUser = async (req, res) => {
             if(role==2||role==3){
             // to get the date of 6 months after first working date
                 const dateWorked6months = new Date(new Date(startingDate).setMonth(new Date(startingDate).getMonth()+6));
-            
             // if user is an employee or manager, and has been working for at least 6 months, create a holidays
                 let totalConge;
                 if( !(new Date()<dateWorked6months)){ // if this employee has been working for more than 6 months
                     // to calculate days of congés payés
-                    totalConge = calculateCongesPayes(startingDate);calculateCongesPayes(startingDate);      
+                    totalConge = calculateCongesPayes(startingDate);    
                 } else {
                     totalConge = 0;
-                }
-                    
+                }            
                 const holiday = {
                     "idUser": [idUser],
                     "holidaysAvailable": totalConge,
                     "holidaysTaken": 0
                     };
                 Holidays.create(holiday); //to create this employee's paid leaves
-                
             }    
         });    
     } catch (error) {
         res.send(error);
-    }
+        }
 };
 // to get all the users
 exports.getAll = async (req, res) => {
@@ -65,9 +62,7 @@ exports.getUserByUserName = async (req, res) => {
     try{
         const userName = req.body.userName;
         const user = await Users.findOne({
-                where: {
-                    userName: [userName]
-                }
+                where: {userName: [userName]}
             });
         res.json(user);
     }catch (error) {
@@ -83,18 +78,10 @@ exports.deleteUserById = async (req, res) => {
         const holiday = await Holidays.findByPk(id);
         // if this user has holidays, delete his holidays
         if(holiday){ 
-            await Holidays.destroy({
-                where: {
-                    idUser: [id]
-                }
-            });
+            await Holidays.destroy({where: {idUser: [id]}});
         }
         // delete this user
-        await Users.destroy({
-            where: {
-                id: [id]
-            }
-        }); 
+        await Users.destroy({where: {id: [id]}}); 
         res.json("user and user's holidays are deleted");
     }catch (error) {
         res.send(error);
@@ -105,40 +92,56 @@ exports.deleteUserById = async (req, res) => {
 exports.updateUser = async (req, res) => {
     try {
         const id = req.body.id;
-        const user = await Users.findByPk(id);      
-        let objUser = req.body;
-        delete objUser.id;     
-        await Users.update(objUser,{    // update user
-            where: { 
-                id : [id]
-            },
-            returning: true
-        }).then(async ()=>{
-            // get and return this user after being updated
-            const updatedUser = await Users.findByPk(id);
-            res.json(updatedUser) ; // return updated user
-            const role = updatedUser.role;
-            if(role==2 || role==3){ // try to update user's holiday if user is employee or manager
-                const startingDate = updatedUser.firstWorkingDay;
-                const dateWorked6months = new Date(new Date(startingDate).setMonth(new Date(startingDate).getMonth()+6));
-                    // recalculate paid leaves
-                if( new Date() >= dateWorked6months){ //update user's holiday if user has been working for more than 6 months 
-                    const totalPaidLeaves = calculateCongesPayes(startingDate);
-                    const holiday = await Holidays.findByPk(id);
-                    const holidaysTaken = holiday.holidaysTaken;
-                    const holidaysAvailable = totalPaidLeaves - holidaysTaken;
-                    const holidayUpdate = {
-                        "holidaysAvailable": holidaysAvailable, 
-                        "holidaysTaken": [holidaysTaken]
-                        };
+        const user = await Users.findByPk(id);  
+        if(user){ 
+            let objUser = req.body;
+            delete objUser.id;     
+            await Users.update(objUser,{    // update user
+                where: { 
+                    id : [id]
+                },
+                returning: true
+            }).then(async ()=>{
+                // get and return this user after being updated
+                const updatedUser = await Users.findByPk(id);
+                res.json(updatedUser) ; // return updated user
+                
+                const holiday = await Holidays.findByPk(id);
+                const holidayUpdate = updateHoliday(updatedUser, holiday);
+                if(holidayUpdate){
                     Holidays.update(holidayUpdate,{    // update user
                         where: { 
                             idUser : [id]
                         }
                     });  
-                } 
+                }
+            });
+        } else {
+            res.json("user doesn't exist");
+        }
+    }catch (error) {
+        res.send(error);
+    }
+};
+
+exports.updateUserHoliday = async (req, res) => {
+    try {
+        const id = req.params.idUser;   
+        
+            // get and return this user after being updated
+            const updatedUser = await Users.findByPk(id);
+             // return updated user
+            
+            const holiday = await Holidays.findByPk(id);
+            const holidayUpdate = updateHoliday(updatedUser, holiday);
+            if(holidayUpdate){
+                Holidays.update(holidayUpdate,{    // update user
+                    where: { 
+                        idUser : [id]
+                    }
+                });  
             }
-        });
+            res.json(holidayUpdate) ;
     }catch (error) {
         res.send(error);
     }
@@ -159,7 +162,6 @@ function calculateCongesPayes(startingDate){
                         daysPast += 1;
                     }               
                 }
-                
 // to calculate worked days of first working months
                 const firstWorkingDay = startingDate.getDate();
                 
@@ -177,4 +179,24 @@ function calculateCongesPayes(startingDate){
                 }   
                 const totalConge = parseFloat(fullMonths*2.5 + 2.5/21*(daysPast+daysWorked)).toFixed(1); 
                 return totalConge;
+};
+
+function updateHoliday(user, holiday){
+    const role = user.role;
+    if(role==2 || role==3){ // try to update user's holiday if user is employee or manager
+        const startingDate = user.firstWorkingDay;
+        const dateWorked6months = new Date(new Date(startingDate).setMonth(new Date(startingDate).getMonth()+6));
+            // recalculate paid leaves
+        if( new Date() >= dateWorked6months){ //update user's holiday if user has been working for more than 6 months 
+            const totalPaidLeaves = calculateCongesPayes(startingDate);
+            const holidaysTaken = holiday.holidaysTaken;
+            const holidaysAvailable = totalPaidLeaves - holidaysTaken;
+            const holidayUpdate = {
+                "holidaysAvailable": holidaysAvailable, 
+                "holidaysTaken": [holidaysTaken]
+                };
+                console.log(holidayUpdate);
+            return holidayUpdate;
+        }
+    }    
 }

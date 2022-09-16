@@ -1,4 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
+    try{
     const Users = sequelize.define("Users", {
         id: {
             type: DataTypes.INTEGER,
@@ -35,6 +36,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             allowNull: true
         }
+    },{
+        updatedAt: false,
+        createdAt: false
     });
     
     Users.associate = function (models) {
@@ -48,4 +52,8 @@ module.exports = (sequelize, DataTypes) => {
         Users.hasMany(models.Demandes, {foreignKey: 'idUser'});
     }; 
     return Users;
+} catch (error) {
+    console.error(error);
+    }  
+
 };

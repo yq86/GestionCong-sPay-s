@@ -1,4 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
+    try {
     const Demandes = sequelize.define("Demandes", {
         id: {
             type: DataTypes.INTEGER,
@@ -23,9 +24,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             allowNull: false
         },
-        type: {
+        idType: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            references: {
+                model: 'Types',
+                key: 'idType'
+            }
         },
         status: {
             type: DataTypes.INTEGER,
@@ -35,16 +40,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: true
         }
+    },{
+        updatedAt: false,
+        createdAt: false
     });
-
-    Demandes.associate = function (models) {
-        Demandes.hasOne(models.Types, {
-            foreignKey: {
-                name: 'idTypeKey',
-                field: 'idType',
-            },
-            as: 'Types',
-        }); 
-    }; 
     return Demandes;
+} catch (error) {
+    console.error(error);
+}  
 };
