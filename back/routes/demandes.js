@@ -9,4 +9,5 @@ demandesRouter.get('/', demandesCtrl.getAllDemandes);
 demandesRouter.get('/getById/:id', demandesCtrl.getDemandeById);
 demandesRouter.get('/getByIdUser/:idUser', demandesCtrl.getDemandeByIdUser);
 demandesRouter.delete('/deleteById/:id', demandesCtrl.deleteDemandeById);
+demandesRouter.put('/update', demandesCtrl.updateDemande);
 module.exports = demandesRouter;

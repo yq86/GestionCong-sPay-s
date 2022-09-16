@@ -89,3 +89,32 @@ exports.deleteDemandeById = async (req, res) => {
         res.send(error);
     }
 };
+
+exports.updateDemande = async (req, res) => {
+    try {
+        const id = req.body.id;
+        const status = req.body.status;
+        const description = req.body.description;
+        const objDemande = req.body;
+        delete objDemande.id;
+        if(status == 3){
+            if(!description){
+                res.json("please specify the reason of refuse");
+            } else {
+                await Demandes.update(objDemande, {
+                    where : {id: [id]}
+                });
+                const demande = await Demandes.findByPk(id);
+                res.json(demande);
+            }
+        } else {
+            await Demandes.update(objDemande, {
+                where : {id: [id]}
+            });
+            const demande = await Demandes.findByPk(id);
+                res.json(demande);
+        }
+    }catch (error) {
+        res.send(error);
+    }
+}
