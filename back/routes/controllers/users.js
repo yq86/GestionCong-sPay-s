@@ -4,6 +4,7 @@ const { response } = require('../../app');
 const router = express.Router();
 const { Users } = require("../../models");
 const { Holidays } = require("../../models");
+const { Demandes } = require("../../models");
 // to create users
 exports.createUser = async (req, res) => {
     try{
@@ -39,7 +40,14 @@ exports.createUser = async (req, res) => {
 // to get all the users
 exports.getAll = async (req, res) => {
     try{
-        const users = await Users.findAll();
+        const users = await Users.findAll({ include: [
+            {
+                model: Demandes
+            },
+            {
+                model: Holidays
+            }
+        ]});
         res.json(users); // to return the list of users
     }catch (error) {
         // res.send(error);
@@ -50,7 +58,14 @@ exports.getAll = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const id = req.params.id;
-        const user = await Users.findByPk(id);
+        const user = await Users.findByPk(id, { include: [
+            {
+                model: Demandes
+            },
+            {
+                model: Holidays
+            }
+        ]});
         res.json(user); 
     }catch (error) {
         res.send(error);
@@ -62,6 +77,14 @@ exports.getUserByUserName = async (req, res) => {
     try{
         const userName = req.body.userName;
         const user = await Users.findOne({
+            include: [
+                {
+                    model: Demandes
+                },
+                {
+                    model: Holidays
+                }
+            ],
                 where: {userName: [userName]}
             });
         res.json(user);
@@ -76,13 +99,23 @@ exports.deleteUserById = async (req, res) => {
     try {
         const id = req.params.id;
         const holiday = await Holidays.findByPk(id);
+        const demandes = await Demandes.findAll({
+            where: {idUser: [id]}
+        });
         // if this user has holidays, delete his holidays
         if(holiday){ 
             await Holidays.destroy({where: {idUser: [id]}});
         }
+        // if this user has demandes, delete them
+        if(demandes){
+            demandes.forEach(el => {
+                Demandes.destroy({where: {idUser: [id]}});
+            });
+        }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        res.json("user and user's holidays are deleted");
+        //res.json("user and user's holidays are deleted");
+        res.json(demandes);
     }catch (error) {
         res.send(error);
     }

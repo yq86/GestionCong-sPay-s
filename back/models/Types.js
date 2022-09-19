@@ -1,12 +1,6 @@
-
-module.exports = async (sequelize, DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
     try {
-        let Types = sequelize.define("Types", {
-            idType: {
-                type: DataTypes.INTEGER,
-                autoIncrement: true,
-                primaryKey: true
-            },
+        const Types = sequelize.define("Types", {
             name: {
                 type: DataTypes.STRING,
                 unique: true,
@@ -14,21 +8,23 @@ module.exports = async (sequelize, DataTypes) => {
         },{
             updatedAt: false,
             createdAt: false
-        }).sync().then((types) => {
+        });
+        Types.associate = function (models) {
+            Types.hasMany(models.Demandes, {foreignKey: 'idType', as:'type'});
+        }; 
+    
+        Types.sync().then((types) => {
             types.bulkCreate([
                 { name: "maladie" },
                 { name: "maternité" },
                 { name: "mariage" },
                 { name: "funéraille" },
                 { name: "demenagement" }
-    ],{ignoreDuplicates: true}); 
-});
+            ],{ignoreDuplicates: true}); 
             
-            Types.associate = function (models) {
-                Types.hasMany(models.Demandes, {foreignKey: 'idType'});
-            }; 
-        
-            return Types;
+        });
+            
+        return Types;
     } catch (error) {
         console.error(error);
     }    

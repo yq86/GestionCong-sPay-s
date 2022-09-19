@@ -1,0 +1,31 @@
+
+module.exports = (sequelize, DataTypes) => {
+    try {
+        const Statuses = sequelize.define("Statuses", {
+            name: {
+                type: DataTypes.STRING,
+                unique: true,
+            }
+        },{
+            updatedAt: false,
+            createdAt: false
+        });
+        Statuses.associate = function (models) {
+            Statuses.hasMany(models.Demandes, {foreignKey: 'idStatus', as: 'status'});
+        }; 
+        
+        Statuses.sync().then((status) => {
+            status.bulkCreate([
+                { name: "en cours" },
+                { name: "validée" },
+                { name: "refusée" }
+            ],{ignoreDuplicates: true});
+            
+        });         
+            
+        return Statuses;
+    } catch (error) {
+        console.error(error);
+    }    
+};
+

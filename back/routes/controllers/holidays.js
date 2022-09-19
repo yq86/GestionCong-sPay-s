@@ -36,8 +36,8 @@ exports.updateHoliday = async (req, res) => {
             returning: true
         }).then(async ()=>{
             // get and return this user after being updated
-            const uh = await Holidays.findByPk(id);
-            res.json(uh); 
+            const updatedHoliday = await Holidays.findByPk(id);
+            res.json(updatedHoliday); 
         });
     }catch (error) {
         res.send(error);
