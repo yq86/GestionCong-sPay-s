@@ -1,4 +1,4 @@
-
+// create table Statuses with default values
 module.exports = (sequelize, DataTypes) => {
     try {
         const Statuses = sequelize.define("Statuses", {
@@ -19,10 +19,8 @@ module.exports = (sequelize, DataTypes) => {
                 { name: "en cours" },
                 { name: "validée" },
                 { name: "refusée" }
-            ],{ignoreDuplicates: true});
-            
-        });         
-            
+            ],{ignoreDuplicates: true});        
+        });                 
         return Statuses;
     } catch (error) {
         console.error(error);

@@ -1,3 +1,4 @@
+// create table Demandes
 module.exports = (sequelize, DataTypes) => {
     try {
         const Demandes = sequelize.define("Demandes", {
@@ -14,12 +15,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT,
                 allowNull: true
             }
-        },{
-            updatedAt: false,
-            createdAt: false
         });
-    return Demandes;
-} catch (error) {
-    console.error(error);
-}  
+        return Demandes;
+    } catch (error) {
+        console.error(error);
+    }  
 };

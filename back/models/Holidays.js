@@ -1,6 +1,7 @@
+// create table Holidays
 module.exports = (sequelize, DataTypes) => {
     try{
-    const Holidays = sequelize.define("Holidays", {
+        const Holidays = sequelize.define("Holidays", {
         holidaysAvailable: {
             type: DataTypes.FLOAT,
             allowNull: true,
@@ -9,12 +10,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true
         }
-    },{
-        updatedAt: false, 
-        createdAt: false
-    });
-    return Holidays;
-} catch (error) {
-    console.error(error);
-}  
+        },{
+            updatedAt: false, 
+            createdAt: false
+        });
+        return Holidays;
+    } catch (error) {
+        console.error(error);
+    }  
 };

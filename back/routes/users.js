@@ -1,7 +1,6 @@
 require('../config/db');
 const express = require('express');
 const usersRouter =  express.Router();
-
 const usersCtrl = require('./controllers/users');
 
 usersRouter.post('/create', usersCtrl.createUser);

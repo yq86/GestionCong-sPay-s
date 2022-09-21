@@ -1,3 +1,4 @@
+// create table Users
 module.exports = (sequelize, DataTypes) => {
     try{
         const Users = sequelize.define("Users", {
@@ -34,14 +35,12 @@ module.exports = (sequelize, DataTypes) => {
             updatedAt: false,
             createdAt: false
         });  
-        
         Users.associate = function (models) {
-            Users.hasOne(models.Holidays, {foreignKey: 'idUser'});       
-            Users.hasMany(models.Demandes, {foreignKey: 'idUser'});
+        Users.hasOne(models.Holidays, {foreignKey: 'idUser'});       
+        Users.hasMany(models.Demandes, {foreignKey: 'idUser'});
         }; 
-    return Users;
-} catch (error) {
-    console.error(error);
+        return Users;
+    } catch (error) {
+        console.error(error);
     }  
-
 };

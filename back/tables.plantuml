@@ -2,7 +2,7 @@
 Holidays *-- Users
 Demandes *-- Users
 Types *-- Demandes
-
+Status *-- Demandes
 
 
 class Users {
@@ -33,10 +33,11 @@ class Demandes {
 
 class Types {
 #int id;
-#String normal;
-#String maternity;
-#String marriage;
-#String funeral;
-#String sickness;
+#String name;
+}
+
+class Status {
+#int id;
+#String name;
 }
 @enduml

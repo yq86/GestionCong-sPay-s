@@ -1,32 +1,30 @@
 require('../../config/db');
-const express = require("express");
-const { response } = require('../../app');
-const router = express.Router();
+const Sequelize = require('sequelize');
+const op = Sequelize.Op;
 const { Demandes } = require("../../models");
 const { Holidays } = require("../../models");
-const { Types } = require("../../models/Types.js");
+const { Types } = require("../../models");
 const { Users } = require("../../models");
+const { Statuses } = require("../../models");
+const cron = require('node-cron');
 // to create demande
 exports.createDemande = async (req, res) => {
     try{
         const demande = req.body;
         demande.idStatus = 1;
-        const idUser = req.body.idUser;
-        
-        // if this user's available holidays are not 0, create demande
+        const idUser = req.body.idUser;   
         const holiday = await Holidays.findByPk(idUser);
         const date1 = new Date(demande.startingDate);
-        const date2 = new Date(demande.endingDate);
-        
+        const date2 = new Date(demande.endingDate); 
         const daysDemande = Math.ceil((date2.getTime() - date1.getTime())/ (1000 * 3600 * 24)+1);
        // res.json(daysDemande)
-        if(demande.idType ==1 && holiday.holidaysAvailable >= daysDemande){
-            await Demandes.create(demande).then(createdDemande=>{
+        if(demande.idType ==1 && holiday.holidaysAvailable >= daysDemande){ // if user has enough holidays
+            await Demandes.create(demande).then(createdDemande=>{ // create demande
                 res.json(createdDemande); // return created demande
             }); 
-        } else if(demande.idType == 1 && holiday.holidaysAvailable < daysDemande){
+        } else if(demande.idType == 1 && holiday.holidaysAvailable < daysDemande){ // if user doesnt have enough holidays
             res.json("you dont have available holidays");
-        } else if(demande.idType != 1){
+        } else if(demande.idType != 1){ // si demande d'autre type de congés payés
             // create demande
             await Demandes.create(demande).then(createdDemande=>{
                 res.json(createdDemande); // return created demande 
@@ -37,16 +35,17 @@ exports.createDemande = async (req, res) => {
     }
 };
 
+//to get all demandes
 exports.getAllDemandes = async (req, res) => {
     try{
         const demandes = await Demandes.findAll();
-        console.log(demandes);
         res.json(demandes); // to return the list of users
     }catch (error) {
         res.send(error);
     }
 };
 
+//to get demande by id
 exports.getDemandeById = async (req, res) => {
     try {
         const id = req.params.id;
@@ -55,8 +54,10 @@ exports.getDemandeById = async (req, res) => {
     }catch (error) {
         res.send(error);
     } 
+
 };
 
+// to get demandes by id user
 exports.getDemandeByIdUser = async (req, res) => {
     try {
         const id = req.params.idUser;
@@ -71,6 +72,7 @@ exports.getDemandeByIdUser = async (req, res) => {
     } 
 };
 
+// to delete demande by id
 exports.deleteDemandeById = async (req, res) => {
     try {
         const id = req.params.id;
@@ -96,6 +98,7 @@ exports.deleteDemandeById = async (req, res) => {
     }
 };
 
+// to update demande
 exports.updateDemande = async (req, res) => {
     try {
         const id = req.body.id;
@@ -104,25 +107,25 @@ exports.updateDemande = async (req, res) => {
         const iduser = demandeOriginal.idUser;
         const idtype = demandeOriginal.idType;
         const status = req.body.idStatus;
-        const description = req.body.description;
-        
-        
+        const description = req.body.description;           
         delete objDemande.id;
-        if(status == 3){
-            if(!description){
+        if(status == 3){  // if refuse
+            if(!description){ // description required
                 res.json("please specify the reason of refuse");
             } else {
-                await Demandes.update(objDemande, {
+                await Demandes.update(objDemande, { // to update demande
                     where : {id: [id]}
                 });
-                const demandes = await Demandes.findByPk(id);
-                res.json(demandes);
+                // to send email to user
+                sendEmailToEmployee(iduser, id);
+                const demande = await Demandes.findByPk(id);
+                res.json(demande); // return updated demande
             }
         } else if(status == 2 && idtype == 1 ){ // if congé payé normale accepted
             await Demandes.update(objDemande, { // update demande status
                 where : {id: [id]}
             });
-            // update holiday
+            // to update holiday
             const holiday = await Holidays.findOne({
                 where: {idUser: iduser}});
             const date1 = new Date(demandeOriginal.startingDate);
@@ -134,18 +137,22 @@ exports.updateDemande = async (req, res) => {
                 "holidaysAvailable": holidaysAvb, 
                 "holidaysTaken": holidaysTaken
                 };
-            await Holidays.update(holidayUpdate,{    // update user
+            await Holidays.update(holidayUpdate,{    // update holiday
                 where: { 
                     idUser : iduser
                 }, 
             });
+            // to send email to user
+            sendEmailToEmployee(iduser, id);
             const demande = await Demandes.findByPk(id);
-                res.json(demande);
+            res.json(demande);
         } else if (status == 2 && idtype != 1 ) { // if other type(maladie...) congé payé accepted
             await Demandes.update(objDemande, { // update demande status
                 where : {id: [id]}
             });
             const demande = await Demandes.findByPk(id);
+            // to send email to user
+            sendEmailToEmployee(iduser, id);
             res.json(demande);
         } else if (status ==1){
             res.json("status did not change");
@@ -154,3 +161,223 @@ exports.updateDemande = async (req, res) => {
         res.send(error);
     }
 };
+
+async function sendEmailToEmployee(idUser, idDemande){
+    try{
+        const user = await Users.findByPk(idUser); 
+        const demande = await Demandes.findByPk(idDemande);
+        const idStatus = demande.idStatus;
+        const idType = demande.idType;
+        const status = await Statuses.findByPk(idStatus);
+        const type = await Types.findByPk(idType);
+        const typeName = type.name;
+        const statusName = status.name;
+        const email = user.email;
+        const description = demande.description;
+        const firstName = user.firstName;
+        const lastName = user.lastName;
+        const startingD = demande.startingDate;
+        const startingDate = startingD.toLocaleString('Fr-fr', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        const endingD = demande.endingDate;
+        const endingDate = endingD.toLocaleString('Fr-fr', { year: 'numeric', month: '2-digit', day: '2-digit' })
+        let messageContent = 'Bonjour, veuillez consulter le nouveau statut de votre demande de congés payés.';
+        let content = `<br><table style="display: flex; border-bottom: #eee 1px solid; color: #000;margin-top: 80px; margin-left: 120px ">
+                            <tr>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Prénom</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Nom</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Congé type</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Status</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Du</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Au</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Description</th>
+                            </tr>
+                            <tr>
+                                <td style="padding-right: 20px"> `;
+                                
+        content += firstName;
+        content += `</td>
+        <td style="padding-right: 20px">`;
+        content += lastName;
+        content += `</td>
+        <td style="padding-right: 20px">`; 
+        content += typeName;
+        content += `</td>
+        <td style="padding-right: 20px">`; 
+        content += statusName;
+        content += `</td>
+        <td style="padding-right: 20px">`; 
+        content += startingDate;
+        content += `</td>
+        <td style="padding-right: 20px">`;  
+        content += endingDate;
+        content += `</td>
+        <td style="padding-right: 20px">`;  
+        content += description;
+        content += `</td>
+        <tr>                  
+        </table>`;
+
+        messageContent += content;
+        const nodemailer = require('nodemailer');
+        let transporter = nodemailer.createTransport({
+            host: 'smtp.mailtrap.io',
+            port: 2525,
+            auth: {
+                user: "11590b13c9bd26",
+                pass: "9783192eb4bc16"
+            }
+        });
+
+        message = {
+            from: "request@email.com",
+            to: email,
+            subject: "Demande congé payé",
+            html: messageContent
+        };
+        transporter.sendMail(message, function(err, info) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log(info);
+            }
+        }); 
+    }catch(error) {
+        res.send(error);
+    }
+};
+
+async function sendEmailToManager(){ 
+    try {
+        let date = new Date();
+        const bigYesterday =new Date(date.setDate(date.getDate()-4));
+        const today = new Date()
+
+        // find all the managers
+        const managers =await Users.findAll({
+            where: { role: 2} // to get managers
+        });
+        // find demandes from the last 5 days
+        const demandes = await Demandes.findAll({
+            where: {
+                createdAt: {
+                    [op.between]: [ bigYesterday, today],
+                }
+            }
+        });
+        let messageContent = 'Bonjour, veuillez consulter les demandes des congés payés des derniers 5 jours.';
+        let content = `<br><table style="display: flex; border-bottom: #eee 1px solid; color: #000;margin-top: 80px; margin-left: 120px ">
+                            <tr>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Prénom</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Nom</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Congé type</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Status</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Du</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Au</th>
+                                <th style="padding-bottom: 5px; padding-right: 20px">Description</th>
+                            </tr>`;
+
+        for(const demande of demandes){
+            const idStatus = demande.idStatus;                           
+            const idType = demande.idType;
+            const idUser = demande.idUser;
+            const status = await Statuses.findByPk(idStatus);                       
+            const type = await Types.findByPk(idType);
+            const user = await Users.findByPk(idUser);                           
+            const typeName = type.name;
+            const statusName = status.name;
+            const description = demande.description;
+            const firstName = user.firstName;                           
+            const lastName = user.lastName;
+            const startingD = demande.startingDate;
+            const startingDate = startingD.toLocaleString('Fr-fr', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const endingD = demande.endingDate;
+            const endingDate = endingD.toLocaleString('Fr-fr', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        
+            content += `<tr>
+            <td style="padding-right: 20px"> `;
+            
+            content += firstName;
+            content += `</td>
+            <td style="padding-right: 20px">`;
+            content += lastName;
+            content += `</td>
+            <td style="padding-right: 20px">`; 
+            content += typeName;
+            content += `</td>
+            <td style="padding-right: 20px">`; 
+            content += statusName;
+            content += `</td>
+            <td style="padding-right: 20px">`; 
+            content += startingDate;
+            content += `</td>
+            <td style="padding-right: 20px">`;  
+            content += endingDate;
+            content += `</td>
+            <td style="padding-right: 20px">`;  
+            content += description;
+            content += `</td>
+            <tr>`;                 
+        }
+        content += `</table>`;
+        messageContent += content;
+
+        const nodemailer = require('nodemailer');
+        let transporter = nodemailer.createTransport({
+            host: 'smtp.mailtrap.io',
+            port: 2525,
+            auth: {
+                user: "11590b13c9bd26",
+                pass: "9783192eb4bc16"
+            }
+        });
+
+        for(const manager of managers){
+            const email = manager.email;
+            message = {
+                from: "request@email.com",
+                to: email,
+                subject: "Demande congés payés des derniers 5 jours",
+                html: messageContent
+            };
+            transporter.sendMail(message, function(err, info) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log(info);
+                }
+            }); 
+        }
+    } catch (error) {
+        res.send(error);
+    }
+}
+
+// to delete refused demandes
+async function deleteDemandesRefused(){
+    try{
+        const demandes = await Demandes.destroy({ // to delete refused demandes 
+            where: { idStatus: 3}
+        });
+    }catch (error) {
+        res.send(error);
+    }
+}
+
+// send email to managers every morning at 6am from monday to friday
+cron.schedule('00 06 * * 1-5', () => {
+    try{
+        sendEmailToManager();
+    }catch (error) {
+        res.send(error);
+    }
+    
+});
+
+// delete refused demandes every morning at 6:30am from monday to friday
+cron.schedule('30 06 * * 1-5', () => {
+    try{
+        deleteDemandesRefused();
+    }catch (error) {
+        res.send(error);
+    }
+});
