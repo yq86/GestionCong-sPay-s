@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
             }
         });
         Demandes.associate = function (models) {
-            Demandes.hasOne(models.Types); 
+            Demandes.belongsTo(models.Types); 
+            Demandes.belongsTo(models.Statuses); 
             Demandes.belongsTo(models.Users, {foreignKey: {allowNull: false}});
         }; 
         return Demandes;

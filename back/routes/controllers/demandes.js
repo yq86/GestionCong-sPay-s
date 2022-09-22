@@ -11,20 +11,21 @@ const cron = require('node-cron');
 exports.createDemande = async (req, res) => {
     try{
         const demande = req.body;
-        demande.idStatus = 1;
-        const idUser = req.body.idUser;   
+        console.log(demande.TypeId)
+        demande.StatusId = 1;
+        const idUser = req.body.UserId;   
         const holiday = await Holidays.findByPk(idUser);
         const date1 = new Date(demande.startingDate);
         const date2 = new Date(demande.endingDate); 
         const daysDemande = Math.ceil((date2.getTime() - date1.getTime())/ (1000 * 3600 * 24)+1);
        // res.json(daysDemande)
-        if(demande.idType ==1 && holiday.holidaysAvailable >= daysDemande){ // if user has enough holidays
+        if(demande.TypeId ==1 && holiday.holidaysAvailable >= daysDemande){ // if user has enough holidays
             await Demandes.create(demande).then(createdDemande=>{ // create demande
                 res.json(createdDemande); // return created demande
             }); 
-        } else if(demande.idType == 1 && holiday.holidaysAvailable < daysDemande){ // if user doesnt have enough holidays
+        } else if(demande.TypeId == 1 && holiday.holidaysAvailable < daysDemande){ // if user doesnt have enough holidays
             res.json("you dont have available holidays");
-        } else if(demande.idType != 1){ // si demande d'autre type de congés payés
+        } else if(demande.TypeId != 1){ // si demande d'autre type de congés payés
             // create demande
             await Demandes.create(demande).then(createdDemande=>{
                 res.json(createdDemande); // return created demande 
@@ -50,7 +51,7 @@ exports.getDemandeById = async (req, res) => {
     try {
         const id = req.params.id;
         const demande = await Demandes.findByPk(id,{
-            include : [Users]
+            include : [Users, Types, Statuses]
         });
         res.json(demande); 
     }catch (error) {
@@ -106,9 +107,9 @@ exports.updateDemande = async (req, res) => {
         const id = req.body.id;
         const demandeOriginal = await Demandes.findByPk(id);
         const objDemande = req.body; 
-        const iduser = demandeOriginal.idUser;
-        const idtype = demandeOriginal.idType;
-        const status = req.body.idStatus;
+        const iduser = demandeOriginal.UserId;
+        const idtype = demandeOriginal.TypeId;
+        const status = req.body.StatusId;
         const description = req.body.description;           
         delete objDemande.id;
         if(status == 3){  // if refuse
@@ -168,8 +169,8 @@ async function sendEmailToEmployee(idUser, idDemande){
     try{
         const user = await Users.findByPk(idUser); 
         const demande = await Demandes.findByPk(idDemande);
-        const idStatus = demande.idStatus;
-        const idType = demande.idType;
+        const idStatus = demande.StatusId;
+        const idType = demande.TypeId;
         const status = await Statuses.findByPk(idStatus);
         const type = await Types.findByPk(idType);
         const typeName = type.name;

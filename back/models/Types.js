@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             createdAt: false
         });
         Types.associate = function (models) {
-            Types.belongsTo(models.Demandes, {foreignKey: {allowNull: false}});
+            Types.hasMany(models.Demandes, {foreignKey: {allowNull: false}});
         }; 
         Types.sync().then((types) => {
             types.bulkCreate([

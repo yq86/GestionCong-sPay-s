@@ -2,6 +2,8 @@ require('../../config/db');
 const { Users } = require("../../models");
 const { Holidays } = require("../../models");
 const { Demandes } = require("../../models");
+const { Types } = require("../../models");
+const { Statuses } = require("../../models");
 // to create users
 exports.createUser = async (req, res) => {
     try{
@@ -51,7 +53,12 @@ exports.getUserById = async (req, res) => {
     try {
         const id = req.params.id;
         const user = await Users.findByPk(id, { 
-            include: [ Demandes, Holidays ]
+            include: [ {
+                model: Demandes,
+                include: [ Types, Statuses ]
+            },
+            
+                Holidays ]
         });
         res.json(user); 
     }catch (error) {
@@ -78,12 +85,28 @@ exports.getUserByUserName = async (req, res) => {
 exports.deleteUserById = async (req, res) => {
     try {
         const id = req.params.id;
+        const holiday = await Holidays.findByPk(id);
+        const demandes = await Demandes.findAll({
+            where: {idUser: [id]}
+        });
+        // if this user has holidays, delete his holidays
+        if(holiday){ 
+            await Holidays.destroy({where: {idUser: [id]}});
+        }
+        // if this user has demandes, delete them
+        if(demandes){
+            demandes.forEach(el => {
+                Demandes.destroy({where: {idUser: [id]}});
+            });
+        }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        res.json("user and user's holidays and demandes are deleted");
+        //res.json("user and user's holidays are deleted");
+        res.json(demandes);
     }catch (error) {
         res.send(error);
     }
+
 };
 
 // to update user
