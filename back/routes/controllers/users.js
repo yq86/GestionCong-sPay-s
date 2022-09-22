@@ -2,6 +2,8 @@ require('../../config/db');
 const { Users } = require("../../models");
 const { Holidays } = require("../../models");
 const { Demandes } = require("../../models");
+const { Types } = require("../../models");
+const { Statuses } = require("../../models");
 // to create users
 exports.createUser = async (req, res) => {
     try{
@@ -22,7 +24,7 @@ exports.createUser = async (req, res) => {
                     totalConge = 0;  // no congés payés normale available
                 }            
                 const holiday = {
-                    "idUser": [idUser],
+                    "UserId": [idUser],
                     "holidaysAvailable": totalConge,
                     "holidaysTaken": 0
                     };
@@ -37,14 +39,9 @@ exports.createUser = async (req, res) => {
 // to get all the users
 exports.getAll = async (req, res) => {
     try{
-        const users = await Users.findAll({ include: [
-            {
-                model: Demandes
-            },
-            {
-                model: Holidays
-            }
-        ]});
+        const users = await Users.findAll({ 
+            include: [ Demandes,Holidays ]
+        });
         res.json(users); // to return the list of users
     }catch (error) {
         // res.send(error);
@@ -55,14 +52,14 @@ exports.getAll = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const id = req.params.id;
-        const user = await Users.findByPk(id, { include: [
-            {
-                model: Demandes
+        const user = await Users.findByPk(id, { 
+            include: [ {
+                model: Demandes,
+                include: [ Types, Statuses ]
             },
-            {
-                model: Holidays
-            }
-        ]});
+            
+                Holidays ]
+        });
         res.json(user); 
     }catch (error) {
         res.send(error);
@@ -74,15 +71,8 @@ exports.getUserByUserName = async (req, res) => {
     try{
         const userName = req.body.userName;
         const user = await Users.findOne({
-            include: [
-                {
-                    model: Demandes
-                },
-                {
-                    model: Holidays
-                }
-            ],
-                where: {userName: [userName]}
+            where: {userName: [userName]},
+            include: [ Demandes, Holidays ]
             });
         res.json(user);
     }catch (error) {
@@ -97,25 +87,25 @@ exports.deleteUserById = async (req, res) => {
         const id = req.params.id;
         const holiday = await Holidays.findByPk(id);
         const demandes = await Demandes.findAll({
-            where: {idUser: [id]}
+            where: {UserId: [id]}
         });
         // if this user has holidays, delete his holidays
         if(holiday){ 
-            await Holidays.destroy({where: {idUser: [id]}});
+            await Holidays.destroy({where: {UserId: [id]}});
         }
         // if this user has demandes, delete them
         if(demandes){
             demandes.forEach(el => {
-                Demandes.destroy({where: {idUser: [id]}});
+                Demandes.destroy({where: {UserId: [id]}});
             });
         }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        //res.json("user and user's holidays are deleted");
-        res.json(demandes);
+        res.json("user and user's holidays are deleted");     
     }catch (error) {
         res.send(error);
     }
+
 };
 
 // to update user
@@ -133,9 +123,7 @@ exports.updateUser = async (req, res) => {
                 returning: true
             }).then(async ()=>{
                 // get and return this user after being updated
-                const updatedUser = await Users.findByPk(id);
-                res.json(updatedUser) ; // return updated user
-                
+                const updatedUser = await Users.findByPk(id);          
                 const holiday = await Holidays.findByPk(id);
                 const holidayUpdate = updateHoliday(updatedUser, holiday);
                 if(holidayUpdate){
@@ -145,6 +133,10 @@ exports.updateUser = async (req, res) => {
                         }
                     });  
                 }
+                const newUser = await Users.findByPk(id, {
+                    include: [ Holidays]
+                });
+                res.json(newUser);
             });
         } else {
             res.json("user doesn't exist");
