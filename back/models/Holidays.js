@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
             updatedAt: false, 
             createdAt: false
         });
+        Holidays.associate = function (models) {
+            Holidays.belongsTo(models.Users, {foreignKey: {allowNull: false}});
+        }; 
         return Holidays;
     } catch (error) {
         console.error(error);

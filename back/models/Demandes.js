@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true
             }
         });
+        Demandes.associate = function (models) {
+            Demandes.hasOne(models.Types); 
+            Demandes.belongsTo(models.Users, {foreignKey: {allowNull: false}});
+        }; 
         return Demandes;
     } catch (error) {
         console.error(error);

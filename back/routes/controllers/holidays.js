@@ -1,5 +1,6 @@
 require('../../config/db');
 const { Holidays } = require("../../models");
+const { Users } = require("../../models");
 
 // to create Holidays
 exports.getAllUsersHolidays = async (req, res) => {
@@ -15,7 +16,10 @@ exports.getAllUsersHolidays = async (req, res) => {
 exports.getHolidayByIdUser = async (req, res) => {
     try {
         const id = req.params.idUser;
-        const holiday = await Holidays.findByPk(id);
+        const holiday = await Holidays.findOne( {
+            where: {UserId: [id]}, 
+            include: [ Users ]
+        });
         res.json(holiday); 
     }catch (error) {
         res.send(error);

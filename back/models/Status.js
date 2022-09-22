@@ -10,10 +10,6 @@ module.exports = (sequelize, DataTypes) => {
             updatedAt: false,
             createdAt: false
         });
-        Statuses.associate = function (models) {
-            Statuses.hasMany(models.Demandes, {foreignKey: 'idStatus', as: 'status'});
-        }; 
-        
         Statuses.sync().then((status) => {
             status.bulkCreate([
                 { name: "en cours" },

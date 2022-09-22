@@ -22,7 +22,7 @@ exports.createUser = async (req, res) => {
                     totalConge = 0;  // no congés payés normale available
                 }            
                 const holiday = {
-                    "idUser": [idUser],
+                    "UserId": [idUser],
                     "holidaysAvailable": totalConge,
                     "holidaysTaken": 0
                     };
@@ -37,14 +37,9 @@ exports.createUser = async (req, res) => {
 // to get all the users
 exports.getAll = async (req, res) => {
     try{
-        const users = await Users.findAll({ include: [
-            {
-                model: Demandes
-            },
-            {
-                model: Holidays
-            }
-        ]});
+        const users = await Users.findAll({ 
+            include: [ Demandes,Holidays ]
+        });
         res.json(users); // to return the list of users
     }catch (error) {
         // res.send(error);
@@ -55,14 +50,9 @@ exports.getAll = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const id = req.params.id;
-        const user = await Users.findByPk(id, { include: [
-            {
-                model: Demandes
-            },
-            {
-                model: Holidays
-            }
-        ]});
+        const user = await Users.findByPk(id, { 
+            include: [ Demandes, Holidays ]
+        });
         res.json(user); 
     }catch (error) {
         res.send(error);
@@ -74,15 +64,8 @@ exports.getUserByUserName = async (req, res) => {
     try{
         const userName = req.body.userName;
         const user = await Users.findOne({
-            include: [
-                {
-                    model: Demandes
-                },
-                {
-                    model: Holidays
-                }
-            ],
-                where: {userName: [userName]}
+            where: {userName: [userName]},
+            include: [ Demandes, Holidays ]
             });
         res.json(user);
     }catch (error) {
@@ -95,24 +78,9 @@ exports.getUserByUserName = async (req, res) => {
 exports.deleteUserById = async (req, res) => {
     try {
         const id = req.params.id;
-        const holiday = await Holidays.findByPk(id);
-        const demandes = await Demandes.findAll({
-            where: {idUser: [id]}
-        });
-        // if this user has holidays, delete his holidays
-        if(holiday){ 
-            await Holidays.destroy({where: {idUser: [id]}});
-        }
-        // if this user has demandes, delete them
-        if(demandes){
-            demandes.forEach(el => {
-                Demandes.destroy({where: {idUser: [id]}});
-            });
-        }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        //res.json("user and user's holidays are deleted");
-        res.json(demandes);
+        res.json("user and user's holidays and demandes are deleted");
     }catch (error) {
         res.send(error);
     }

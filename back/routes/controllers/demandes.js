@@ -49,7 +49,9 @@ exports.getAllDemandes = async (req, res) => {
 exports.getDemandeById = async (req, res) => {
     try {
         const id = req.params.id;
-        const demande = await Demandes.findByPk(id);
+        const demande = await Demandes.findByPk(id,{
+            include : [Users]
+        });
         res.json(demande); 
     }catch (error) {
         res.send(error);

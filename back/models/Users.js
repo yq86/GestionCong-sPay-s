@@ -36,8 +36,8 @@ module.exports = (sequelize, DataTypes) => {
             createdAt: false
         });  
         Users.associate = function (models) {
-        Users.hasOne(models.Holidays, {foreignKey: 'idUser'});       
-        Users.hasMany(models.Demandes, {foreignKey: 'idUser'});
+            Users.hasOne(models.Holidays, {onDelete: "cascade"});       
+            Users.hasMany(models.Demandes, {onDelete: "cascade"});
         }; 
         return Users;
     } catch (error) {
