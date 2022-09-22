@@ -17,7 +17,7 @@ class Users {
 }
 
 class Holidays {
-#int idUser;
+#int UserId;
 #int holidaysAvailable;
 #int holidaysTaken;
 }
@@ -27,13 +27,13 @@ class Demandes {
 #int idUser;
 #date startingDate;
 #date endingingDate;
-#int type;
-#int status;
+#int TypeId;
+#int StatusId;
 }
 
 class Types {
 #int id;
-#String name;
+#String name
 }
 
 class Status {

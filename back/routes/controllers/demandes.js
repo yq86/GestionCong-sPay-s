@@ -7,6 +7,7 @@ const { Types } = require("../../models");
 const { Users } = require("../../models");
 const { Statuses } = require("../../models");
 const cron = require('node-cron');
+
 // to create demande
 exports.createDemande = async (req, res) => {
     try{
@@ -27,8 +28,12 @@ exports.createDemande = async (req, res) => {
             res.json("you dont have available holidays");
         } else if(demande.TypeId != 1){ // si demande d'autre type de congés payés
             // create demande
-            await Demandes.create(demande).then(createdDemande=>{
-                res.json(createdDemande); // return created demande 
+            await Demandes.create(demande).then(async (createdDemande)=>{
+                const idDemande = createdDemande.id;
+                const newDemande = await  Demandes.findByPk(idDemande, {
+                    include: [ Types, Statuses, Users]
+                });
+                res.json(newDemande); // return created demande 
             }); 
         }
     } catch (error) {
@@ -39,7 +44,9 @@ exports.createDemande = async (req, res) => {
 //to get all demandes
 exports.getAllDemandes = async (req, res) => {
     try{
-        const demandes = await Demandes.findAll();
+        const demandes = await Demandes.findAll({
+            include: [ Users, Types, Statuses]
+        });
         res.json(demandes); // to return the list of users
     }catch (error) {
         res.send(error);
@@ -65,8 +72,9 @@ exports.getDemandeByIdUser = async (req, res) => {
     try {
         const id = req.params.idUser;
         const demandes = await Demandes.findAll({
+            include: [ Users, Types, Statuses],
             where: {
-                idUser: [id]
+                UserId: [id]
             }
         });
         res.json(demandes); 
@@ -88,7 +96,9 @@ exports.deleteDemandeById = async (req, res) => {
                         id: [id]
                     }
                 });
-                const demandes = await Demandes.findAll();
+                const demandes = await Demandes.findAll({
+                    include: [ Users, Types, Statuses ]
+                });
                 res.json(demandes);
             } else {
                 res.json("demande accepted, can not be deleted");
@@ -121,7 +131,9 @@ exports.updateDemande = async (req, res) => {
                 });
                 // to send email to user
                 sendEmailToEmployee(iduser, id);
-                const demande = await Demandes.findByPk(id);
+                const demande = await Demandes.findByPk(id, {
+                    include: [ Users, Types, Statuses]
+                });
                 res.json(demande); // return updated demande
             }
         } else if(status == 2 && idtype == 1 ){ // if congé payé normale accepted
@@ -147,13 +159,17 @@ exports.updateDemande = async (req, res) => {
             });
             // to send email to user
             sendEmailToEmployee(iduser, id);
-            const demande = await Demandes.findByPk(id);
+            const demande = await Demandes.findByPk(id, {
+                include: [ Types, Statuses ]
+            });
             res.json(demande);
         } else if (status == 2 && idtype != 1 ) { // if other type(maladie...) congé payé accepted
             await Demandes.update(objDemande, { // update demande status
                 where : {id: [id]}
             });
-            const demande = await Demandes.findByPk(id);
+            const demande = await Demandes.findByPk(id, {
+                include: [ Types, Statuses]
+            });
             // to send email to user
             sendEmailToEmployee(iduser, id);
             res.json(demande);

@@ -87,22 +87,21 @@ exports.deleteUserById = async (req, res) => {
         const id = req.params.id;
         const holiday = await Holidays.findByPk(id);
         const demandes = await Demandes.findAll({
-            where: {idUser: [id]}
+            where: {UserId: [id]}
         });
         // if this user has holidays, delete his holidays
         if(holiday){ 
-            await Holidays.destroy({where: {idUser: [id]}});
+            await Holidays.destroy({where: {UserId: [id]}});
         }
         // if this user has demandes, delete them
         if(demandes){
             demandes.forEach(el => {
-                Demandes.destroy({where: {idUser: [id]}});
+                Demandes.destroy({where: {UserId: [id]}});
             });
         }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        //res.json("user and user's holidays are deleted");
-        res.json(demandes);
+        res.json("user and user's holidays are deleted");     
     }catch (error) {
         res.send(error);
     }
@@ -124,9 +123,7 @@ exports.updateUser = async (req, res) => {
                 returning: true
             }).then(async ()=>{
                 // get and return this user after being updated
-                const updatedUser = await Users.findByPk(id);
-                res.json(updatedUser) ; // return updated user
-                
+                const updatedUser = await Users.findByPk(id);          
                 const holiday = await Holidays.findByPk(id);
                 const holidayUpdate = updateHoliday(updatedUser, holiday);
                 if(holidayUpdate){
@@ -136,6 +133,10 @@ exports.updateUser = async (req, res) => {
                         }
                     });  
                 }
+                const newUser = await Users.findByPk(id, {
+                    include: [ Holidays]
+                });
+                res.json(newUser);
             });
         } else {
             res.json("user doesn't exist");
