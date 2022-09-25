@@ -160,7 +160,7 @@ exports.updateDemande = async (req, res) => {
             // to send email to user
             sendEmailToEmployee(iduser, id);
             const demande = await Demandes.findByPk(id, {
-                include: [ Types, Statuses ]
+                include: [ Users, Types, Statuses ]
             });
             res.json(demande);
         } else if (status == 2 && idtype != 1 ) { // if other type(maladie...) congé payé accepted
@@ -168,7 +168,7 @@ exports.updateDemande = async (req, res) => {
                 where : {id: [id]}
             });
             const demande = await Demandes.findByPk(id, {
-                include: [ Types, Statuses]
+                include: [ Users, Types, Statuses]
             });
             // to send email to user
             sendEmailToEmployee(iduser, id);
