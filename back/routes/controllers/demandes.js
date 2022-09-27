@@ -12,7 +12,7 @@ const cron = require('node-cron');
 exports.createDemande = async (req, res) => {
     try{
         const demande = req.body;
-        console.log(demande.TypeId)
+        console.log(demande.TypeId);
         demande.StatusId = 1;
         const idUser = req.body.UserId;   
         const holiday = await Holidays.findByPk(idUser);
@@ -142,7 +142,7 @@ exports.updateDemande = async (req, res) => {
             });
             // to update holiday
             const holiday = await Holidays.findOne({
-                where: {idUser: iduser}});
+                where: {UserId: iduser}});
             const date1 = new Date(demandeOriginal.startingDate);
             const date2 = new Date(demandeOriginal.endingDate);     
             const daysDemande = Math.ceil((date2.getTime() - date1.getTime())/ (1000 * 3600 * 24)+1);
@@ -154,7 +154,7 @@ exports.updateDemande = async (req, res) => {
                 };
             await Holidays.update(holidayUpdate,{    // update holiday
                 where: { 
-                    idUser : iduser
+                    UserId : iduser
                 }, 
             });
             // to send email to user

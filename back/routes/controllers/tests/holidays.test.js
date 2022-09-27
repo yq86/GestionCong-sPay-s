@@ -1,18 +1,52 @@
+const request = require("supertest");
+const ap = "http://localhost:9090";
 
-const { app } = require('../../../app');
-const { supertest } = require('supertest');
-const request = require("supertest")("https://airportgap.dev-tester.com/api");
-const { getAllUsersHolidays, getHolidayByIdUser } = require('../holidays');
-
-describe("use a route", () => {
-    it("should return an object", async () => {
-        await request.get("/holidays/getById/" + 5).then(response => {
-            expect(response).toEqual(expect.objectContaining({}));
-        });
+describe("holidays crud", () => {
+    it("GET holiday by userid", async () => {
         
-        /*  same results as above
-        const response = await request.get("/holidays/getById/" + 5);
-        expect(response).toEqual(expect.objectContaining({})); 
-        */
+        await request(ap)
+            .get("/holidays/getById/" + 1)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then((response) => {
+                expect(response.body).toEqual(
+                    expect.objectContaining({
+                        holidaysAvailable: expect.any(Number)
+                    })
+                );
+            });
     });
+
+    it("GET holiday by userid which do not exist", async () => {
+        await request(ap)
+            .get("/holidays/getById/" + 1700)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then((response) => {
+                expect(response.body).toEqual('holiday does not exist');
+            });
+            
+    });
+
+    it("should return a list of objects", async () => {
+    
+        await request(ap)
+            .get("/holidays/")
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then((response) => {
+                expect(response.body).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({
+                            User: expect.objectContaining({
+                                userName: expect.any(String)
+                            })
+                        })
+                    ])
+                );
+            });
+        
+    });
+
+
 });

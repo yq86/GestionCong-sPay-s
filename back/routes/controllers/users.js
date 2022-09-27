@@ -17,7 +17,7 @@ exports.createUser = async (req, res) => {
             // to get the date of 6 months after first working date
                 const dateWorked6months = new Date(new Date(startingDate).setMonth(new Date(startingDate).getMonth()+6));
                 let totalConge;
-                if( !(new Date()<dateWorked6months)){ // if this employee has been working for more than 6 months
+                if( new Date() >= dateWorked6months){ // if this employee has been working for more than 6 months
                     // to calculate days of congés payés
                     totalConge = calculateCongesPayes(startingDate);    
                 } else { // if this employee has not been working for more than 6 months
@@ -42,9 +42,13 @@ exports.getAll = async (req, res) => {
         const users = await Users.findAll({ 
             include: [ Demandes,Holidays ]
         });
-        res.json(users); // to return the list of users
+        if (users.length != 0) {
+            res.json(users); // to return the list of users
+        } else {
+            res.json("no user");
+        }
     }catch (error) {
-        // res.send(error);
+        res.send(error);
     }
 };
 
@@ -60,7 +64,12 @@ exports.getUserById = async (req, res) => {
             
                 Holidays ]
         });
-        res.json(user); 
+        if (user) {
+            res.json(user); 
+        } else {
+            res.json("user does not exist");
+        }
+        
     }catch (error) {
         res.send(error);
     }    
@@ -85,7 +94,9 @@ exports.getUserByUserName = async (req, res) => {
 exports.deleteUserById = async (req, res) => {
     try {
         const id = req.params.id;
-        const holiday = await Holidays.findByPk(id);
+        const holiday = await Holidays.findOne({
+            where: {UserId: [id]}
+        });
         const demandes = await Demandes.findAll({
             where: {UserId: [id]}
         });
@@ -129,7 +140,7 @@ exports.updateUser = async (req, res) => {
                 if(holidayUpdate){
                     Holidays.update(holidayUpdate,{    // update user
                         where: { 
-                            idUser : [id]
+                            UserId : [id]
                         }
                     });  
                 }
@@ -152,12 +163,14 @@ exports.updateUserHoliday = async (req, res) => {
         // get and return this user after being updated
         const updatedUser = await Users.findByPk(id);
             // return updated user    
-        const holiday = await Holidays.findByPk(id);
+        const holiday = await Holidays.findOne({
+            where: { UserId: [id]}
+        });
         const holidayUpdate = updateHoliday(updatedUser, holiday);
         if(holidayUpdate){
             Holidays.update(holidayUpdate,{    // update user
                 where: { 
-                    idUser : [id]
+                    UserId : [id]
                 }
             });  
         }
@@ -200,7 +213,7 @@ function calculateCongesPayes(startingDate){
     } catch (error) {
         res.send(error);
     }           
-};
+}
 
 function updateHoliday(user, holiday){
     try {
@@ -215,7 +228,7 @@ function updateHoliday(user, holiday){
                 const holidaysAvailable = totalPaidLeaves - holidaysTaken;
                 const holidayUpdate = {
                     "holidaysAvailable": holidaysAvailable, 
-                    "holidaysTaken": [holidaysTaken]
+                    "holidaysTaken": holidaysTaken
                     };
                 return holidayUpdate;
             }

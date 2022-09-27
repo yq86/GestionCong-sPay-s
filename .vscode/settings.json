@@ -1,0 +1,6 @@
+{
+    "files.autoSave": "afterDelay",
+    "editor.fontSize": 12,
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "checkstyle.trace.server": "messages"
+}
