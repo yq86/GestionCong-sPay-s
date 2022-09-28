@@ -1,9 +1,16 @@
 require('../../config/db');
+require('dotenv').config();
 const { Users } = require("../../models");
 const { Holidays } = require("../../models");
 const { Demandes } = require("../../models");
 const { Types } = require("../../models");
 const { Statuses } = require("../../models");
+
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const app = express();
+
+app.use(express.json());
 // to create users
 exports.createUser = async (req, res) => {
     try{
@@ -76,14 +83,23 @@ exports.getUserById = async (req, res) => {
 };
 
 // to get user by userName
-exports.getUserByUserName = async (req, res) => {
+exports.userLogin = async (req, res) => {
     try{
         const userName = req.body.userName;
+        const password = req.body.password;
         const user = await Users.findOne({
-            where: {userName: [userName]},
-            include: [ Demandes, Holidays ]
-            });
-        res.json(user);
+            where: {userName: [userName], password: [password]},
+            include: [ Holidays ]
+        });
+        if (user) {
+            const userjwt = { name: userName };
+        const accessToken = jwt.sign(userjwt, process.env.ACCESS_TOKEN_SECRET);
+        res.json(accessToken);
+        } else {
+            res.json(null);
+        }
+        
+        
     }catch (error) {
         res.send(error);
     }
