@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './components/login/login.component';
+import { DemandesComponent } from './components/demandes/demandes.component';
 
 const routes: Routes = [];
 
@@ -11,12 +12,16 @@ const routes: Routes = [];
     RouterModule.forRoot([
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'login',
         pathMatch: 'full'
       },
       {
-        path: 'home',
+        path: 'login',
         component: LoginComponent
+      },
+      {
+        path: 'employee-demandes',
+        component: DemandesComponent
       },
     ])
   ],

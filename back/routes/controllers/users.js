@@ -10,7 +10,6 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const app = express();
 
-app.use(express.json());
 // to create users
 exports.createUser = async (req, res) => {
     try{
@@ -47,13 +46,9 @@ exports.createUser = async (req, res) => {
 exports.getAll = async (req, res) => {
     try{
         const users = await Users.findAll({ 
-            include: [ Demandes,Holidays ]
+            include: [ Holidays ]
         });
-        if (users.length != 0) {
-            res.json(users); // to return the list of users
-        } else {
-            res.json("no user");
-        }
+        res.json(users); // to return the list of users
     }catch (error) {
         res.send(error);
     }
@@ -71,30 +66,25 @@ exports.getUserById = async (req, res) => {
             
                 Holidays ]
         });
-        if (user) {
-            res.json(user); 
-        } else {
-            res.json("user does not exist");
-        }
-        
+        res.json(user);  
     }catch (error) {
         res.send(error);
     }    
 };
 
-// to get user by userName
+// to get user by userName to login
 exports.userLogin = async (req, res) => {
     try{
         const userName = req.body.userName;
         const password = req.body.password;
         const user = await Users.findOne({
             where: {userName: [userName], password: [password]},
-            include: [ Holidays ]
+            include: [{ model: Demandes, include: [Types, Statuses] }, Holidays ]
         });
         if (user) {
             const userjwt = { name: userName };
-        const accessToken = jwt.sign(userjwt, process.env.ACCESS_TOKEN_SECRET);
-        res.json(accessToken);
+            const accessToken = jwt.sign(userjwt, process.env.ACCESS_TOKEN_SECRET);
+            res.json({user: user, accesstoken:accessToken});
         } else {
             res.json(null);
         }

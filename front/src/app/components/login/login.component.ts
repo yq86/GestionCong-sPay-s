@@ -4,6 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Console } from 'console';
 import { UserLogin } from 'src/app/models/user-login';
 import { UserService } from '../../services/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,10 @@ import { UserService } from '../../services/user.service';
 })
 export class LoginComponent implements OnInit {
 
+    constructor(
+      private userService: UserService,
+      private router: Router
+  ) {}
 
   form!: FormGroup;
   userLogin!: UserLogin;
@@ -20,9 +25,7 @@ export class LoginComponent implements OnInit {
 
   error: string | null | undefined;
 
-  constructor(
-    private userService: UserService
-  ) {}
+
 
 
   ngOnInit(): void {
@@ -41,13 +44,17 @@ export class LoginComponent implements OnInit {
   }
 
   submit() {
+    if (this.form.invalid) {
+      return;
+    }
     this.userLogin = { userName: this.form.value.username, password: this.form.value.password };
     console.log(this.userLogin);
     this.userService.login(this.userLogin).subscribe(
       (response: any) => {
         if (response) {
           window.localStorage.setItem('name', this.form.value.username);
-          window.localStorage.setItem('accessToken', response);
+          window.localStorage.setItem('accessToken', response.accesstoken);
+          this.router.navigate(['employee-demandes']);
         } else {
           this.error = "username or password invalid";
           this.initForm();

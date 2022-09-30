@@ -8,12 +8,7 @@ exports.getAllUsersHolidays = async (req, res) => {
         const holidays = await Holidays.findAll({
             include: [ Users]
         });
-        if (holidays) {
-            res.json(holidays); // to return the list of holidays
-        } else {
-            res.json("no holidays");
-        }
-        
+        res.json(holidays); // to return the list of holidays
     }catch (error) {
         res.send(error);
     }
@@ -27,12 +22,7 @@ exports.getHolidayByIdUser = async (req, res) => {
             where: {UserId: [id]}, 
             include: [ Users ]
         });
-        
-        if (holiday) {
-            res.json(holiday); 
-        } else {
-            res.json("holiday does not exist");
-        }
+        res.json(holiday); 
     }catch (error) {
         res.send(error);
     } 

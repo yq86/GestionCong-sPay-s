@@ -7,13 +7,15 @@ import { FooterComponent } from './components/footer/footer.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material-module';
 import { LoginComponent } from './components/login/login.component';
+import { DemandesComponent } from './components/demandes/demandes.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     FooterComponent,
-    LoginComponent
+    LoginComponent,
+    DemandesComponent
   ],
   imports: [
     BrowserModule,
