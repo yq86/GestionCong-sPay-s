@@ -18,6 +18,7 @@ describe("create a user salarie1 who worked for more than 6 months, so holidays 
             .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
+                console.log(response.body)
                 expect(response.body).toEqual(
                     expect.objectContaining({
                         userName: "salarie1"
@@ -84,7 +85,6 @@ describe("create a user salarie1 who worked for more than 6 months, so holidays 
             .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                expect(response.body.holidaysAvailable).toEqual(19.1);
                 expect(response.body.holidaysTaken).toEqual(2);
             });
     });
@@ -241,7 +241,6 @@ describe("salarie1 demande a type 3 congés payés(maternité), demande id3, bei
             .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                expect(response.body.holidaysAvailable).toEqual(19.1);
                 expect(response.body.holidaysTaken).toEqual(2);
             });
     });

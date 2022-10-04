@@ -20,7 +20,6 @@ export class RoleGuardService implements CanActivate {
     // on the data property
     const role = route.data['role'];
     if(route.data['role2']){
-      console.log(route.data['role2'])
       this.role2 = route.data['role2'];
     }
     
@@ -28,9 +27,6 @@ export class RoleGuardService implements CanActivate {
     if (token != null) {
         // decode the token to get its payload
       this.tokenPayload = decode(token);
-      console.log(this.tokenPayload)
-      console.log(this.tokenPayload.role)
-      console.log(role)
       if(this.role2){
         if ( (this.tokenPayload.role != role) && (this.tokenPayload.role != this.role2)) {
           this.router.navigate(['login']);

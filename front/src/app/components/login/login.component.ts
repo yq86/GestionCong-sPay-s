@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Console } from 'console';
 import { UserLogin } from 'src/app/models/user-login';
+import { Token } from 'src/app/models/token';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 
@@ -21,6 +22,7 @@ export class LoginComponent implements OnInit {
   form!: FormGroup;
   userLogin!: UserLogin;
   user: any;
+  token!: Token;
 
 
   error: string | null | undefined;
@@ -52,9 +54,10 @@ export class LoginComponent implements OnInit {
     this.userService.login(this.userLogin).subscribe(
       (response: any) => {
         if (response) {
-          console.log(response)
           window.localStorage.setItem('name', this.form.value.username);
           window.localStorage.setItem('accessToken', response.accesstoken);
+
+
           if(response.user.role == 3){
             this.router.navigate(['employee-demandes']);
           }else if(response.user.role == 2){
@@ -66,23 +69,29 @@ export class LoginComponent implements OnInit {
         } else {
           this.error = "username or password invalid";
           this.initForm();
-          console.log(localStorage.getItem('accessToken'));
         }
       },
       (error: HttpErrorResponse) => {
         alert(error.message)
       }
     )
-  }
+
+    
+/*   // example to use the token to access the database
+    if (localStorage.getItem('accessToken')) {
+      this.token = { accessToken: localStorage.getItem('accessToken') };
+          
+      this.userService.getAllUsers(this.token).subscribe(
+        (res: any) => {
+          if (res) {
+            console.log(res)
+          }
+        }
+      )
+    }  */
+  };
 
   initError() {
     this.error = null;
   }
-
-  /*
-  reroute() {
-    if (this.authService.isLoggedIn()) { //Si l'utilisateur est déjà connecté, le renvoie sur l'accueil.
-      this.router.navigate(['accueil']);
-    }
-  } */
 }
