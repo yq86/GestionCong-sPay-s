@@ -1,8 +1,12 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, CanActivate } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './components/login/login.component';
 import { DemandesComponent } from './components/demandes/demandes.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { ManagerComponent } from './components/manager/manager.component';
+import { AuthGuardService as AuthGuard } from './auth/auth-guard.service';
+import { RoleGuardService as RoleGuard } from './auth/role-guard.service';
 
 const routes: Routes = [];
 
@@ -21,8 +25,27 @@ const routes: Routes = [];
       },
       {
         path: 'employee-demandes',
-        component: DemandesComponent
+        component: DemandesComponent,
+        canActivate: [AuthGuard]
       },
+      {
+        path: 'manager',
+        component: ManagerComponent,
+        canActivate: [RoleGuard],
+        data: {
+          role: '2', 
+          role2: '1'
+        }
+      },
+      {
+        path: 'admin',
+        component: AdminComponent,
+        canActivate: [RoleGuard],
+        data: {
+          role: '1'
+        }
+      },
+      { path: '**', redirectTo: '' }
     ])
   ],
   exports: [RouterModule]

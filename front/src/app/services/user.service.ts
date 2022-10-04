@@ -21,17 +21,8 @@ export class UserService {
       return this.http.post<any>(`${this.apiServerUrl}/users/login`,user, this.httpOptions) ;
     }
 
-    public deleteOneShape(shapeId: number): Observable<any> {
-      return this.http.delete<any>(`${this.apiServerUrl}/shapes/delete/${shapeId}`) ;
-    }
 
-    public updateShape(shape: any): Observable<any> {
-      return this.http.put<any>(`${this.apiServerUrl}/shapes`,shape, this.httpOptions) ;
 
-    }
 
-    public addShape(shape: any): Observable<any> {
-      return this.http.post<any>(`${this.apiServerUrl}/shapes/add`, shape, this.httpOptions) ;
-    }
 
 }

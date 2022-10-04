@@ -10,6 +10,10 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const app = express();
 
+let refreshTokens = [];
+
+
+
 // to create users
 exports.createUser = async (req, res) => {
     try{
@@ -46,7 +50,7 @@ exports.createUser = async (req, res) => {
 exports.getAll = async (req, res) => {
     try{
         const users = await Users.findAll({ 
-            include: [ Holidays ]
+            include: [ Demandes, Holidays ]
         });
         res.json(users); // to return the list of users
     }catch (error) {
@@ -82,17 +86,39 @@ exports.userLogin = async (req, res) => {
             include: [{ model: Demandes, include: [Types, Statuses] }, Holidays ]
         });
         if (user) {
-            const userjwt = { name: userName };
-            const accessToken = jwt.sign(userjwt, process.env.ACCESS_TOKEN_SECRET);
-            res.json({user: user, accesstoken:accessToken});
+            const userjwt = { name: userName, role: user.role };
+            const accessToken = generateAccessToken(userjwt);
+            const refreshToken = jwt.sign(userjwt, process.env.REFRESH_TOKEN_SECRET);
+            res.json({user: user, accesstoken: accessToken, refreshtoken: refreshToken});
         } else {
             res.json(null);
         }
-        
-        
     }catch (error) {
         res.send(error);
     }
+};
+
+exports.userToken = async (req, res) => {
+    try{
+        const refreshToken = req.body.token;
+        if (refreshToken == null) return res.sendStatus(401);
+        if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) return res.sendStatus(403);
+        //    const accessToken = generateAccessToken(name: user.userName)
+        });
+    }catch (error) {
+        res.send(error);
+    }
+};
+
+function generateAccessToken(user) {
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+}
+
+exports.userLogOut = async (req, res) => {
+    refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+    res.sendStatus(204);
 };
 
 
