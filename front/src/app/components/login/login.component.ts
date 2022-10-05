@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Console } from 'console';
 import { UserLogin } from 'src/app/models/user-login';
 import { Token } from 'src/app/models/token';
@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
       private router: Router
   ) {}
 
-  form!: FormGroup;
+  form!: UntypedFormGroup;
   userLogin!: UserLogin;
   user: any;
   token!: Token;
@@ -36,9 +36,9 @@ export class LoginComponent implements OnInit {
 
 
    initForm() { // initialize the form to create a drawing
-    this.form = new FormGroup({
-      username: new FormControl(''),
-      password: new FormControl(''),
+    this.form = new UntypedFormGroup({
+      username: new UntypedFormControl(''),
+      password: new UntypedFormControl(''),
     });
   //  this.userLogin = { userName: "", password: "" };
   //  this.user = {};

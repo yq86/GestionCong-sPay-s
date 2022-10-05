@@ -4,20 +4,23 @@ import { Subject } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarEvent, CalendarEventAction, CalendarEventTimesChangedEvent,CalendarView } from 'angular-calendar';
 import { EventColor } from 'calendar-utils';
+import { FlatpickrModule } from 'angularx-flatpickr';
+import flatpickr from "flatpickr";
 
 
 const colors: Record<string, EventColor> = {
-  red: {
-    primary: '#ad2121',
-    secondary: '#FAE3E3',
-  },
-  blue: {
+
+  sent: {
     primary: '#1e90ff',
-    secondary: '#D1E8FF',
+    secondary: '#1e90ff',
   },
-  yellow: {
-    primary: '#e3bc08',
-    secondary: '#FDF1BA',
+  validate: {
+    primary: '#13F059',
+    secondary: '#13F059',
+  },
+  refuse: {
+    primary: '#DC4E30 ',
+    secondary: '#DC4E30',
   },
 };
 @Component({
@@ -28,10 +31,11 @@ const colors: Record<string, EventColor> = {
 })
 export class DemandesComponent implements OnInit {
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any> | undefined;
+  @ViewChild('modalContent', { static: true })
+  modalContent!: TemplateRef<any>;
+
 
   view: CalendarView = CalendarView.Month;
 
@@ -39,10 +43,10 @@ export class DemandesComponent implements OnInit {
 
   viewDate: Date = new Date();
 
-  modalData: {
+  modalData!: {
     action: string;
     event: CalendarEvent;
-  } | undefined;
+  };
 
   actions: CalendarEventAction[] = [
     {
@@ -69,7 +73,7 @@ export class DemandesComponent implements OnInit {
       start: subDays(startOfDay(new Date()), 1),
       end: addDays(new Date(), 1),
       title: 'A 3 day event',
-      color: { ...colors['red'] },
+      color: { ...colors['sent'] },
       actions: this.actions,
       allDay: true,
       resizable: {
@@ -81,28 +85,10 @@ export class DemandesComponent implements OnInit {
     {
       start: startOfDay(new Date()),
       title: 'An event with no end date',
-      color: { ...colors['yellow'] },
+      color: { ...colors['validate'] },
       actions: this.actions,
     },
-    {
-      start: subDays(endOfMonth(new Date()), 3),
-      end: addDays(endOfMonth(new Date()), 3),
-      title: 'A long event that spans 2 months',
-      color: { ...colors['blue'] },
-      allDay: true,
-    },
-    {
-      start: addHours(startOfDay(new Date()), 2),
-      end: addHours(new Date(), 2),
-      title: 'A draggable and resizable event',
-      color: { ...colors['yellow'] },
-      actions: this.actions,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true,
-      },
-      draggable: true,
-    },
+
   ];
 
   activeDayIsOpen: boolean = true;
@@ -153,7 +139,7 @@ export class DemandesComponent implements OnInit {
         title: 'New event',
         start: startOfDay(new Date()),
         end: endOfDay(new Date()),
-        color: colors['red'],
+        color: colors['1'],
         draggable: true,
         resizable: {
           beforeStart: true,
