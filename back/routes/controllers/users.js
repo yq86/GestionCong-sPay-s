@@ -19,7 +19,7 @@ exports.createUser = async (req, res) => {
     try{
         const user = req.body;
         await Users.create(user).then(createdUser=>{
-            res.json(createdUser); // return created user
+            res.json(200); // return created user
             const idUser = createdUser.id;
             const role = createdUser.role;
             const startingDate = createdUser.firstWorkingDay;
@@ -89,7 +89,7 @@ exports.userLogin = async (req, res) => {
             const userjwt = { name: userName, role: user.role };
             const accessToken = generateAccessToken(userjwt);
             const refreshToken = jwt.sign(userjwt, process.env.REFRESH_TOKEN_SECRET);
-            res.json({user: user, accesstoken: accessToken, refreshtoken: refreshToken});
+            res.json({accesstoken: accessToken, refreshtoken: refreshToken});
         } else {
             res.json(null);
         }
@@ -113,7 +113,7 @@ exports.userToken = async (req, res) => {
 };
 
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '300m' });
 }
 
 exports.userLogOut = async (req, res) => {
@@ -176,10 +176,11 @@ exports.updateUser = async (req, res) => {
                         }
                     });  
                 }
+                /*
                 const newUser = await Users.findByPk(id, {
                     include: [ Holidays]
-                });
-                res.json(newUser);
+                }); */
+                res.json(200);
             });
         } else {
             res.json("user doesn't exist");
@@ -206,7 +207,7 @@ exports.updateUserHoliday = async (req, res) => {
                 }
             });  
         }
-        res.json(holidayUpdate) ;
+        res.json(200) ;
     }catch (error) {
         res.send(error);
     }

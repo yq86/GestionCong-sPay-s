@@ -154,9 +154,9 @@
               />
             </td>
             <td>
-              <button *ngIf="event.color!.primary=='#1e90ff'; " style="background-color: '#1e90ff'">hi</button>
-              <button *ngIf="event.color!.primary=='#13F059'; " style="background-color: '#13F059'">hi</button>
-              <button *ngIf="event.color!.primary=='#DC4E30 '; " style="background-color: '#DC4E30 '">hi</button>
+              <div *ngIf="event.color!.primary=='#1e90ff'; " style="background-color: '#1e90ff'">sent</div>
+              <div *ngIf="event.color!.primary=='#13F059'; " style="background-color: '#13F059'">validated</div>
+              <div *ngIf="event.color!.primary=='#DC4E30 '; " style="background-color: '#DC4E30 '">refused</div>
             </td>
             <td>
               <button class="btn btn-danger" (click)="deleteEvent(event)">

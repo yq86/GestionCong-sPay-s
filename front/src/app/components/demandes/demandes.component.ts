@@ -134,12 +134,12 @@ export class DemandesComponent implements OnInit {
 
   addEvent(): void {
     this.events = [
-      ...this.events,
+      //...this.events,
       {
         title: 'New event',
         start: startOfDay(new Date()),
         end: endOfDay(new Date()),
-        color: colors['1'],
+        color: colors['sent'],
         draggable: true,
         resizable: {
           beforeStart: true,

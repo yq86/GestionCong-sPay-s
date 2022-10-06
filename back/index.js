@@ -3,6 +3,27 @@ const express = require("express");
 const http = require('http');
 const app = require('./app');
 const db = require("./models"); 
+const bodyParser = require("body-parser");
+
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const swaggerOptions = {
+    swaggerDefinition: {
+        info: {
+            title: "Customer API",
+            description: "Customer API Information",
+            contact: {
+                name: "holiday management"
+            },
+            server: ["http://localhost:9090"]
+        }, 
+    },
+    apis: ["index.js"]
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
 
 // get rid of error of empty api
 app.get('/', (req, res)=>{
@@ -13,6 +34,11 @@ app.get('/', (req, res)=>{
 const usersRouter = require('./routes/users');
 const holidaysRouter = require('./routes/holidays');
 const demandesRouter = require('./routes/demandes');
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocs, { explorer: true }) 
+);
 app.use('/users', usersRouter);
 app.use('/holidays', holidaysRouter);
 app.use('/demandes', demandesRouter);

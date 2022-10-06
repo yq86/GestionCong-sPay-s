@@ -33,3 +33,7 @@ pre {
 .date {
   text-align: center;
 }
+
+.select-form {
+  background-color: blue;
+}

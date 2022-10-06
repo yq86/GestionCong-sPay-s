@@ -21,9 +21,12 @@ export class UserService {
   public login(user: UserLogin): Observable<any> {
     return this.http.post<any>(`${this.apiServerUrl}/users/login`,user, this.httpOptions) ;
   }
-  
-  public getAllUsers(token: Token): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
-    return this.http.post<any>(`${this.apiServerUrl}/users/`,token, this.httpOptions) ;
+
+  public getAllUsers(token: any): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
+    }
+    return this.http.get<any>(`${this.apiServerUrl}/users/`, options);
   }
 
 

@@ -6,6 +6,9 @@ import { UserLogin } from 'src/app/models/user-login';
 import { Token } from 'src/app/models/token';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import decode from 'jwt-decode';
+import { Payload } from 'src/app/models/payload';
+import { User } from '../../models/user';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   form!: UntypedFormGroup;
   userLogin!: UserLogin;
-  user: any;
+  user!: User;
   token!: Token;
 
 
@@ -57,15 +60,16 @@ export class LoginComponent implements OnInit {
           window.localStorage.setItem('name', this.form.value.username);
           window.localStorage.setItem('accessToken', response.accesstoken);
 
-
-          if(response.user.role == 3){
+          const pl: Payload = decode(response.accesstoken);
+          console.log(pl)
+          if(pl.role == 3){
             this.router.navigate(['employee-demandes']);
-          }else if(response.user.role == 2){
+          }else if(pl.role == 2){
             this.router.navigate(['manager']);
-          } else if(response.user.role == 1){
+          } else if(pl.role == 1){
             this.router.navigate(['admin']);
           }
-          
+
         } else {
           this.error = "username or password invalid";
           this.initForm();
@@ -76,19 +80,19 @@ export class LoginComponent implements OnInit {
       }
     )
 
-    
-/*   // example to use the token to access the database
+/*
+   // example to use the token to access the database
     if (localStorage.getItem('accessToken')) {
-      this.token = { accessToken: localStorage.getItem('accessToken') };
-          
-      this.userService.getAllUsers(this.token).subscribe(
+      //this.token = { accessToken: localStorage.getItem('accessToken') };
+      const accesstoken = localStorage.getItem('accessToken');
+      this.userService.getAllUsers(accesstoken).subscribe(
         (res: any) => {
           if (res) {
             console.log(res)
           }
         }
       )
-    }  */
+    }*/
   };
 
   initError() {

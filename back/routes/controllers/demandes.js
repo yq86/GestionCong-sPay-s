@@ -28,7 +28,7 @@ exports.createDemande = async (req, res) => {
             // res.json(daysDemande)
             if (demande.TypeId == 1 && holiday.holidaysAvailable >= daysDemande) { // if user has enough holidays
                 await Demandes.create(demande).then(createdDemande => { // create demande
-                    res.json(createdDemande); // return created demande
+                    res.json(200); // return created demande
                 });
             } else if (demande.TypeId == 1 && holiday.holidaysAvailable < daysDemande) { // if user doesnt have enough holidays
                 res.json("you dont have enough holidays");
@@ -36,10 +36,11 @@ exports.createDemande = async (req, res) => {
                 // create demande
                 await Demandes.create(demande).then(async (createdDemande) => {
                     const idDemande = createdDemande.id;
+                    /*
                     const newDemande = await Demandes.findByPk(idDemande, {
                         include: [Types, Statuses, Users]
-                    });
-                    res.json(newDemande); // return created demande 
+                    }); */
+                    res.json(200); // return created demande 
                 });
             }
         } else {
@@ -105,10 +106,11 @@ exports.deleteDemandeById = async (req, res) => {
                         id: [id]
                     }
                 });
+                /*
                 const demandes = await Demandes.findAll({
                     include: [ Users, Types, Statuses ]
-                });
-                res.json(demandes);
+                }); */
+                res.json(200);
             } else {
                 res.json("demande accepted, can not be deleted");
             }    
@@ -141,10 +143,11 @@ exports.updateDemande = async (req, res) => {
                     });
                     // to send email to user
                     sendEmailToEmployee(iduser, id);
+                    /*
                     const demande = await Demandes.findByPk(id, {
                         include: [Users, Types, Statuses]
-                    });
-                    res.json(demande); // return updated demande
+                    }); */
+                    res.json(200); // return updated demande
                 }
             } else if (status == 2 && idtype == 1) { // if congé payé normale accepted
                 await Demandes.update(objDemande, { // update demande status
@@ -170,30 +173,33 @@ exports.updateDemande = async (req, res) => {
                 });
                 // to send email to user
                 sendEmailToEmployee(iduser, id);
+                /*
                 const demande = await Demandes.findByPk(id, {
                     include: [Users, Types, Statuses]
-                });
-                res.json(demande);
+                });*/
+                res.json(200);
             } else if (status == 2 && idtype != 1) { // if other type(maladie...) congé payé accepted
                 await Demandes.update(objDemande, { // update demande status
                     where: { id: [id] }
                 });
+                /*
                 const demande = await Demandes.findByPk(id, {
                     include: [Users, Types, Statuses]
-                });
+                });*/
                 // to send email to user
                 sendEmailToEmployee(iduser, id);
-                res.json(demande);
+                res.json(200);
             } else if (status == 1) {
                 await Demandes.update(objDemande, { // to update demande
                         where: { id: [id] }
                     });
                     // to send email to user
-                    sendEmailToEmployee(iduser, id);
+                sendEmailToEmployee(iduser, id);
+                /*
                     const demande = await Demandes.findByPk(id, {
                         include: [Users, Types, Statuses]
-                    });
-                    res.json(demande); // return updated demande
+                    }); */
+                    res.json(200); // return updated demande
             }
         } else {
             res.json("demande does not exist");

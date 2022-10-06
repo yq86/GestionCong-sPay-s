@@ -18,7 +18,6 @@ describe("create a user salarie1 who worked for more than 6 months, so holidays 
             .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                console.log(response.body)
                 expect(response.body).toEqual(
                     expect.objectContaining({
                         userName: "salarie1"
@@ -62,13 +61,11 @@ describe("create a user salarie1 who worked for more than 6 months, so holidays 
             });
     }); 
 
-    it("UPDATE created demande", async () => {
+    it("UPDATE validate demande ", async () => {
         await request(ap)
             .put("/demandes/update")
             .send({
-                "idUser": "1",
                 "id": 1,
-                "TypeId" : 1,
                 "StatusId": 2
             })
             .expect('Content-Type', /json/)
@@ -118,7 +115,7 @@ describe("salari1, demande a type 1 congés payés, but this salarie1 does not h
 
 
 
-describe("salarie1 demande a type 1 congés payés, this demande id2 being refused without description", () => {
+describe("salarie1 demande a type 1 congés payés, this demande  being refused without description", () => {
 
     it("POST a demande", async () => {
         await request(ap)
