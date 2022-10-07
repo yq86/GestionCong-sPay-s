@@ -28,23 +28,22 @@ exports.createDemande = async (req, res) => {
             // res.json(daysDemande)
             if (demande.TypeId == 1 && holiday.holidaysAvailable >= daysDemande) { // if user has enough holidays
                 await Demandes.create(demande).then(createdDemande => { // create demande
-                    res.json(200); // return created demande
+                    res.send(201); // return status Created
                 });
             } else if (demande.TypeId == 1 && holiday.holidaysAvailable < daysDemande) { // if user doesnt have enough holidays
-                res.json("you dont have enough holidays");
+                res.send(400, "you dont have enough holidays");
             } else if (demande.TypeId != 1) { // si demande d'autre type de congés payés
                 // create demande
                 await Demandes.create(demande).then(async (createdDemande) => {
-                    const idDemande = createdDemande.id;
-                    /*
+                    /*const idDemande = createdDemande.id;
                     const newDemande = await Demandes.findByPk(idDemande, {
                         include: [Types, Statuses, Users]
                     }); */
-                    res.json(200); // return created demande 
+                    res.send(201); // return status Created
                 });
             }
         } else {
-            res.json("user does not exist to create a demande");
+            res.send(400, "user does not exist");
         }    
     } catch (error) {
         res.send(error);
@@ -110,12 +109,12 @@ exports.deleteDemandeById = async (req, res) => {
                 const demandes = await Demandes.findAll({
                     include: [ Users, Types, Statuses ]
                 }); */
-                res.json(200);
+                res.send(200);
             } else {
-                res.json("demande accepted, can not be deleted");
+                res.send(400, "demande accepted, can not be deleted");
             }    
         }else {
-            res.json("demande doesn't exist");
+            res.send(400, "demande doesn't exist");
         }
     }catch (error) {
         res.send(error);
@@ -125,6 +124,7 @@ exports.deleteDemandeById = async (req, res) => {
 // to update demande
 exports.updateDemande = async (req, res) => {
     try {
+        console.log("hi")
         const id = req.body.id;
         const demandeOriginal = await Demandes.findByPk(id);
         if (demandeOriginal) {
@@ -136,7 +136,10 @@ exports.updateDemande = async (req, res) => {
             delete objDemande.id;
             if (status == 3) {  // if refuse
                 if (!description) { // description required
-                    res.json("please specify the reason of refuse");
+
+                    res.send(400, "please specify the reason of refuse");
+                    
+                 //   res.json("please specify the reason of refuse");
                 } else {
                     await Demandes.update(objDemande, { // to update demande
                         where: { id: [id] }
@@ -147,7 +150,7 @@ exports.updateDemande = async (req, res) => {
                     const demande = await Demandes.findByPk(id, {
                         include: [Users, Types, Statuses]
                     }); */
-                    res.json(200); // return updated demande
+                    res.send(200); // return status ok
                 }
             } else if (status == 2 && idtype == 1) { // if congé payé normale accepted
                 await Demandes.update(objDemande, { // update demande status
@@ -177,7 +180,7 @@ exports.updateDemande = async (req, res) => {
                 const demande = await Demandes.findByPk(id, {
                     include: [Users, Types, Statuses]
                 });*/
-                res.json(200);
+                res.send(200);
             } else if (status == 2 && idtype != 1) { // if other type(maladie...) congé payé accepted
                 await Demandes.update(objDemande, { // update demande status
                     where: { id: [id] }
@@ -188,7 +191,7 @@ exports.updateDemande = async (req, res) => {
                 });*/
                 // to send email to user
                 sendEmailToEmployee(iduser, id);
-                res.json(200);
+                res.send(200);
             } else if (status == 1) {
                 await Demandes.update(objDemande, { // to update demande
                         where: { id: [id] }
@@ -199,7 +202,7 @@ exports.updateDemande = async (req, res) => {
                     const demande = await Demandes.findByPk(id, {
                         include: [Users, Types, Statuses]
                     }); */
-                    res.json(200); // return updated demande
+                    res.send(200); // return updated demande
             }
         } else {
             res.json("demande does not exist");

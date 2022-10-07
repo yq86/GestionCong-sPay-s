@@ -15,14 +15,9 @@ describe("create a user salarie1 who worked for more than 6 months, so holidays 
                 "role": "3",
                 "firstWorkingDay": "2022-01-20"
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(201)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        userName: "salarie1"
-                    })
-                );
+                expect(response.text).toEqual("Created");
             });
     }); 
 
@@ -50,14 +45,9 @@ describe("create a user salarie1 who worked for more than 6 months, so holidays 
                 "TypeId": 1,
                 "StatusId": 1
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(201)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        StatusId: 1
-                    })
-                );
+                expect(response.text).toEqual("Created");
             });
     }); 
 
@@ -68,10 +58,9 @@ describe("create a user salarie1 who worked for more than 6 months, so holidays 
                 "id": 1,
                 "StatusId": 2
             })
-            .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                expect(response.body.StatusId).toEqual(2);
+                expect(response.text).toEqual("OK");
             });
     }); 
 
@@ -102,10 +91,9 @@ describe("salari1, demande a type 1 congés payés, but this salarie1 does not h
                 "TypeId": 1,
                 "StatusId": 1
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(400)
             .then((response) => {
-                expect(response.body).toEqual("you dont have enough holidays");
+                expect(response.text).toEqual("you dont have enough holidays");
             });
     }); 
 
@@ -127,14 +115,9 @@ describe("salarie1 demande a type 1 congés payés, this demande  being refused 
                 "TypeId": 1,
                 "StatusId": 1
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(201)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        id: 2
-                    })
-                );
+                expect(response.text).toEqual("Created");
             });
     }); 
 
@@ -147,10 +130,9 @@ describe("salarie1 demande a type 1 congés payés, this demande  being refused 
                 "TypeId" : 1,
                 "StatusId": 3
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(400)
             .then((response) => {
-                expect(response.body).toEqual("please specify the reason of refuse");
+                expect(response.text).toEqual("please specify the reason of refuse");
             });
     });
 
@@ -168,10 +150,9 @@ describe("salarie1's demande id2 being refused with a description", () => {
                 "TypeId" : 1,
                 "StatusId": 3
             })
-            .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                expect(response.body.description).toEqual("to test");
+                expect(response.text).toEqual("OK");
             });
     });
 
@@ -201,14 +182,9 @@ describe("salarie1 demande a type 3 congés payés(maternité), demande id3, bei
                 "TypeId": 3,
                 "StatusId": 1
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(201)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        id: 3
-                    })
-                );
+                expect(response.text).toEqual("Created");
             });
     }); 
 
@@ -221,14 +197,9 @@ describe("salarie1 demande a type 3 congés payés(maternité), demande id3, bei
                 "TypeId" : 3,
                 "StatusId": 2
             })
-            .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        StatusId: 2
-                    })
-                );
+                expect(response.text).toEqual("OK");
             });
     });
 
@@ -260,14 +231,9 @@ describe("create a user salarie2, who worked for less than 6 month, so no holida
                 "role": "3",
                 "firstWorkingDay": "2022-08-20"
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(201)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        userName: "salarie2"
-                    })
-                );
+                expect(response.text).toEqual("Created");
             });
     }); 
 
@@ -294,10 +260,9 @@ describe("create a user salarie2, who worked for less than 6 month, so no holida
                 "TypeId": 1,
                 "StatusId": 1
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(400)
             .then((response) => {
-                expect(response.body).toEqual("you dont have enough holidays");
+                expect(response.text).toEqual("you dont have enough holidays");
             });
     }); 
 });  
@@ -313,14 +278,9 @@ describe("salarie2, demande a type 2 congés payés, and valide", () => {
                 "TypeId": 2,
                 "StatusId": 1
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(201)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        id: 4
-                    })
-                );
+                expect(response.text).toEqual("Created");
             });
     }); 
 
@@ -332,14 +292,9 @@ describe("salarie2, demande a type 2 congés payés, and valide", () => {
                 "id": 4,
                 "StatusId": 2
             })
-            .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        StatusId: 2
-                    })
-                );
+                expect(response.text).toEqual("OK");
             });
     });
 
@@ -368,14 +323,9 @@ describe("salarie2, demande a type 3 congés payés, and refuse without descript
                 "TypeId": 3,
                 "StatusId": 1
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(201)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        id: 5
-                    })
-                );
+                expect(response.text).toEqual("Created");
             });
     });
 
@@ -387,10 +337,9 @@ describe("salarie2, demande a type 3 congés payés, and refuse without descript
                 "id": 5,
                 "StatusId": 3
             })
-            .expect('Content-Type', /json/)
-            .expect(200)
+            .expect(400)
             .then((response) => {
-                expect(response.body).toEqual("please specify the reason of refuse");
+                expect(response.text).toEqual("please specify the reason of refuse");
             });
     });
 
@@ -407,14 +356,9 @@ describe("salarie2, demande id5, and refuse with a description", () => {
                 "description": "you are not sick",
                 "StatusId": 3
             })
-            .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        StatusId: 3
-                    })
-                );
+                expect(response.text).toEqual("OK");
             });
     });
 

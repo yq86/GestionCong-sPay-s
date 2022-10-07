@@ -8,7 +8,8 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import decode from 'jwt-decode';
 import { Payload } from 'src/app/models/payload';
-import { User } from '../../models/user';
+import { User } from 'src/app/models/user';
+import { LoginResponse } from 'src/app/models/login-response';
 
 @Component({
   selector: 'app-login',
@@ -55,7 +56,7 @@ export class LoginComponent implements OnInit {
     this.userLogin = { userName: this.form.value.username, password: this.form.value.password };
 
     this.userService.login(this.userLogin).subscribe(
-      (response: any) => {
+      (response: LoginResponse) => {
         if (response) {
           window.localStorage.setItem('name', this.form.value.username);
           window.localStorage.setItem('accessToken', response.accesstoken);

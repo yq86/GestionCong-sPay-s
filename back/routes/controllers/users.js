@@ -19,7 +19,7 @@ exports.createUser = async (req, res) => {
     try{
         const user = req.body;
         await Users.create(user).then(createdUser=>{
-            res.json(200); // return created user
+          //  res.status(200).send("hi"); // return created user
             const idUser = createdUser.id;
             const role = createdUser.role;
             const startingDate = createdUser.firstWorkingDay;
@@ -40,6 +40,7 @@ exports.createUser = async (req, res) => {
                     };
                 Holidays.create(holiday); //to create this employee's paid leaves
             }    
+            res.sendStatus(201); // status object created
         });    
     } catch (error) {
         res.send(error);
@@ -88,10 +89,10 @@ exports.userLogin = async (req, res) => {
         if (user) {
             const userjwt = { name: userName, role: user.role };
             const accessToken = generateAccessToken(userjwt);
-            const refreshToken = jwt.sign(userjwt, process.env.REFRESH_TOKEN_SECRET);
-            res.json({accesstoken: accessToken, refreshtoken: refreshToken});
+        //    const refreshToken = jwt.sign(userjwt, process.env.REFRESH_TOKEN_SECRET);
+            res.json({accesstoken: accessToken});
         } else {
-            res.json(null);
+            res.sendStatus(412); // status to imply The pre condition given in the request evaluated to false by the server.
         }
     }catch (error) {
         res.send(error);
@@ -104,7 +105,7 @@ exports.userToken = async (req, res) => {
         if (refreshToken == null) return res.sendStatus(401);
         if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-            if (err) return res.sendStatus(403);
+            if (err) return res.sendStatus(403); // status access forbident
         //    const accessToken = generateAccessToken(name: user.userName)
         });
     }catch (error) {
@@ -118,7 +119,7 @@ function generateAccessToken(user) {
 
 exports.userLogOut = async (req, res) => {
     refreshTokens = refreshTokens.filter(token => token !== req.body.token);
-    res.sendStatus(204);
+    res.sendStatus(204); // status no content
 };
 
 
@@ -144,7 +145,7 @@ exports.deleteUserById = async (req, res) => {
         }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        res.json("user and user's holidays are deleted");     
+        res.sendStatus(200);   // status request ok  
     }catch (error) {
         res.send(error);
     }
@@ -180,10 +181,10 @@ exports.updateUser = async (req, res) => {
                 const newUser = await Users.findByPk(id, {
                     include: [ Holidays]
                 }); */
-                res.json(200);
+                res.sendStatus(200);
             });
         } else {
-            res.json("user doesn't exist");
+            res.send(400, "user doesn't exist");
         }
     }catch (error) {
         res.send(error);
@@ -207,7 +208,7 @@ exports.updateUserHoliday = async (req, res) => {
                 }
             });  
         }
-        res.json(200) ;
+        res.sendStatus(200) ;
     }catch (error) {
         res.send(error);
     }
