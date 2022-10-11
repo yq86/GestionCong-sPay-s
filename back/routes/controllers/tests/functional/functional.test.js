@@ -260,7 +260,7 @@ describe("create a user salarie2, who worked for less than 6 month, so no holida
                 "TypeId": 1,
                 "StatusId": 1
             })
-            .expect(400)
+            .expect(400) 
             .then((response) => {
                 expect(response.text).toEqual("you dont have enough holidays");
             });
