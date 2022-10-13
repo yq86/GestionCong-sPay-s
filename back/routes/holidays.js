@@ -9,7 +9,7 @@ const authenticateToken = require('./auth');
 // holidaysRouter.get('/getByIdUser/:idUser', authenticateToken, holidaysCtrl.getHolidayByIdUser);
 
 // function test
-holidaysRouter.get('/', holidaysCtrl.getAllUsersHolidays);
+holidaysRouter.get('/all', holidaysCtrl.getAllUsersHolidays);
 holidaysRouter.get('/getByIdUser/:idUser', holidaysCtrl.getHolidayByIdUser);
 
 module.exports = holidaysRouter;

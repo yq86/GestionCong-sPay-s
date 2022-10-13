@@ -29,7 +29,7 @@ exports.createUser = async (req, res) => {
                 let totalConge;
                 if( new Date() >= dateWorked6months){ // if this employee has been working for more than 6 months
                     // to calculate days of congés payés
-                    totalConge = calculateCongesPayes(startingDate);    
+                    totalConge = calculateCongesPayes(startingDate);  
                 } else { // if this employee has not been working for more than 6 months
                     totalConge = 0;  // no congés payés normale available
                 }            
@@ -37,14 +37,17 @@ exports.createUser = async (req, res) => {
                     "UserId": [idUser],
                     "holidaysAvailable": totalConge,
                     "holidaysTaken": 0
-                    };
+                };
+                
                 Holidays.create(holiday); //to create this employee's paid leaves
             }    
-            res.sendStatus(201); // status object created
+            res.sendStatus(200); // status object created
         });    
     } catch (error) {
         res.send(error);
-        }
+    }finally{
+    res.end();
+    }
 };
 
 // to get all the users
@@ -56,6 +59,8 @@ exports.getAll = async (req, res) => {
         res.json(users); // to return the list of users
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -74,6 +79,8 @@ exports.getUserById = async (req, res) => {
         res.json(user);  
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }    
 };
 
@@ -96,6 +103,8 @@ exports.userLogin = async (req, res) => {
         }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -110,6 +119,8 @@ exports.userToken = async (req, res) => {
         });
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -148,6 +159,8 @@ exports.deleteUserById = async (req, res) => {
         res.sendStatus(200);   // status request ok  
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 
 };
@@ -188,6 +201,8 @@ exports.updateUser = async (req, res) => {
         }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -211,6 +226,8 @@ exports.updateUserHoliday = async (req, res) => {
         res.sendStatus(200) ;
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -246,7 +263,7 @@ function calculateCongesPayes(startingDate){
         return totalConge;
     } catch (error) {
         res.send(error);
-    }           
+    }         
 }
 
 function updateHoliday(user, holiday){
@@ -269,5 +286,7 @@ function updateHoliday(user, holiday){
         }    
     } catch (error) {
         res.send(error);
-    }   
+    }finally{
+    res.end();
+    } 
 }

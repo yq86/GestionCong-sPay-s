@@ -32,36 +32,40 @@ services:
     build:
       context: back
       dockerfile: Dockerfile
+  #  command: ["nodemon", "index.js"]
     networks:
       - holiday
-    command: npm run start
+    command: nodemon index.js
+    
     depends_on:
       - mariadb
     ports:
       - 9090:9090
     volumes:
-      - .:/app/back/
+      - ./back:/app/back/
       - /app/back/node_modules
+    
     restart: unless-stopped
-  web:
-    container_name: holiday-web
-    image: holidayweb:1.0.0
-    env_file:
-      - .env
-    build:
-      context: front
-      dockerfile: Dockerfile
-    networks:
-      - holiday
-    command: npm run start
-    depends_on:
-      - api
-    ports:
-      - 4200:4200
-    volumes:
-      - .:/app/front/
-      - /app/front/node_modules
-    restart: unless-stopped
+    
+  # web:
+  #   container_name: holiday-web
+  #   image: holidayweb:1.0.0
+  #   env_file:
+  #     - .env
+  #   build:
+  #     context: front
+  #     dockerfile: Dockerfile
+  #   networks:
+  #     - holiday
+  #   command: npm run start
+  #   depends_on:
+  #     - api
+  #   ports:
+  #     - 4200:4200
+  #   volumes:
+  #     - ./front:/app/front/
+  #     - /app/front/node_modules
+  #   restart: unless-stopped
     
 
 networks:

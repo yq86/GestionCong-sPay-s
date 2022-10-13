@@ -14,6 +14,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FlatpickrModule } from 'angularx-flatpickr';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { DemandeDateComponent } from './components/demande-date/demande-date.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
     LoginComponent,
     DemandesComponent,
     AdminComponent,
-    ManagerComponent
+    ManagerComponent,
+    DemandeDateComponent
   ],
   imports: [
     BrowserModule,

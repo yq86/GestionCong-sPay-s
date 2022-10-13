@@ -31,6 +31,10 @@ const colors: Record<string, EventColor> = {
 })
 export class DemandesComponent implements OnInit {
 
+    constructor(
+              private modalService: NgbModal
+    ) { }
+
   ngOnInit(): void {}
 
   @ViewChild('modalContent', { static: true })
@@ -93,7 +97,6 @@ export class DemandesComponent implements OnInit {
 
   activeDayIsOpen: boolean = true;
 
-  constructor(private modal: NgbModal) {}
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     if (isSameMonth(date, this.viewDate)) {
@@ -129,10 +132,11 @@ export class DemandesComponent implements OnInit {
 
   handleEvent(action: string, event: CalendarEvent): void {
     this.modalData = { event, action };
-    this.modal.open(this.modalContent, { size: 'lg' });
+    this.modalService.open(this.modalContent, { size: 'lg' });
   }
 
   addEvent(): void {
+
     this.events = [
       //...this.events,
       {

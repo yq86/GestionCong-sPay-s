@@ -14,8 +14,8 @@ const authenticateToken = require('./auth');
 
 
 //function test
-demandesRouter.post('/create', demandesCtrl.createDemande);
-demandesRouter.get('/', demandesCtrl.getAllDemandes);
+demandesRouter.post('/', demandesCtrl.createDemande);
+demandesRouter.get('/all', demandesCtrl.getAllDemandes);
 demandesRouter.get('/getById/:id', demandesCtrl.getDemandeById);
 demandesRouter.get('/getByIdUser/:idUser', demandesCtrl.getDemandeByIdUser);
 demandesRouter.delete('/deleteById/:id',  demandesCtrl.deleteDemandeById);

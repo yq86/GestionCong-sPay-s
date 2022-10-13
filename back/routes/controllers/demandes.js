@@ -47,6 +47,8 @@ exports.createDemande = async (req, res) => {
         }    
     } catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -59,6 +61,8 @@ exports.getAllDemandes = async (req, res) => {
         res.json(demandes); // to return the list of users
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -72,6 +76,8 @@ exports.getDemandeById = async (req, res) => {
         res.json(demande); 
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     } 
 
 };
@@ -89,6 +95,8 @@ exports.getDemandeByIdUser = async (req, res) => {
         res.json(demandes); 
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     } 
 };
 
@@ -118,13 +126,14 @@ exports.deleteDemandeById = async (req, res) => {
         }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
 // to update demande
 exports.updateDemande = async (req, res) => {
     try {
-        console.log("hi")
         const id = req.body.id;
         const demandeOriginal = await Demandes.findByPk(id);
         if (demandeOriginal) {
@@ -209,6 +218,8 @@ exports.updateDemande = async (req, res) => {
         }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -292,7 +303,7 @@ async function sendEmailToEmployee(idUser, idDemande){
             }
         }); 
     }catch(error) {
-        res.send(error);
+        console.log(error);
     }
 }
 
@@ -398,7 +409,7 @@ async function sendEmailToManager(){
             }); 
         }
     } catch (error) {
-        res.send(error);
+        console.log(error);
     }
 }
 
@@ -409,7 +420,7 @@ async function deleteDemandesRefused(){
             where: { idStatus: 3}
         });
     }catch (error) {
-        res.send(error);
+        console.log(error);
     }
 }
 
@@ -418,7 +429,7 @@ cron.schedule('00 06 * * 1-5', () => {
     try{
         sendEmailToManager();
     }catch (error) {
-        res.send(error);
+        console.log(error);
     }
     
 });
@@ -428,6 +439,6 @@ cron.schedule('30 06 * * 1-5', () => {
     try{
         deleteDemandesRefused();
     }catch (error) {
-        res.send(error);
+        console.log(error);
     }
 });

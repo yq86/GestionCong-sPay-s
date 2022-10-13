@@ -19,8 +19,8 @@ const authenticateToken = require('./auth');
 //function test
 
 
-usersRouter.post('/create', usersCtrl.createUser);
-usersRouter.get('/', usersCtrl.getAll); // pass the accessToken in req.body to finally securize the backend
+usersRouter.post('/', usersCtrl.createUser);
+usersRouter.get('/all', usersCtrl.getAll); // pass the accessToken in req.body to finally securize the backend
 usersRouter.get('/getById/:id',usersCtrl.getUserById);
 usersRouter.post('/login', usersCtrl.userLogin);
 usersRouter.delete('/logout', usersCtrl.userLogOut);
