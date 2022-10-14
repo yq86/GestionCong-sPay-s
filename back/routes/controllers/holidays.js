@@ -5,7 +5,6 @@ const { Users } = require("../../models");
 // to create Holidays
 exports.getAllUsersHolidays = async (req, res) => {
     try {
-        console.log("hhh");
         const holidays = await Holidays.findAll({
             include: [ Users]
         });

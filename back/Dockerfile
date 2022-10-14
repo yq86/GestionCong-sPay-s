@@ -14,5 +14,3 @@ COPY . .
 
 
 EXPOSE 9090
-
-#CMD ["nodemon", "index.js"]

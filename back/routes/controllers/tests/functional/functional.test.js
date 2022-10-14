@@ -1,5 +1,5 @@
 const request = require("supertest");
-const ap = "http://localhost:9090";
+const ap = "http://api:9090";
 
 // salarie1 and her tests with different scenario
 describe("create a user salarie1 who worked for more than 6 months, so holidays available, demande a type 1 congés payés, validate this demande", () => {
