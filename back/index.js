@@ -34,6 +34,7 @@ app.get('/', (req, res)=>{
 const usersRouter = require('./routes/users');
 const holidaysRouter = require('./routes/holidays');
 const demandesRouter = require('./routes/demandes');
+const typesRouter = require('./routes/types');
 app.use(
     '/api-docs',
     swaggerUi.serve,
@@ -42,6 +43,7 @@ app.use(
 app.use('/users', usersRouter);
 app.use('/holidays', holidaysRouter);
 app.use('/demandes', demandesRouter);
+app.use('/types', typesRouter);
 
 
 

@@ -7,8 +7,8 @@ import { Token } from '../models/token';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
-  private apiServerUrl = 'http://localhost:9090';
+export class TypesService {
+private apiServerUrl = 'http://localhost:9090';
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -18,19 +18,12 @@ export class UserService {
 
 
 
-  public login(user: UserLogin): Observable<any> {
-    return this.http.post<any>(`${this.apiServerUrl}/users/login`,user, this.httpOptions) ;
-  }
-
-  public getAllUsers(token: any): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
+  public getAllTypes(token: any): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
     const options = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
     }
-    return this.http.get<any>(`${this.apiServerUrl}/users/all`, options);
+    return this.http.get<any>(`${this.apiServerUrl}/types/all`, options);
   }
-
-
-
 
 
 }

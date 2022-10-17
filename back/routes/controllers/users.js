@@ -97,7 +97,7 @@ exports.userLogin = async (req, res) => {
             const userjwt = { name: userName, role: user.role };
             const accessToken = generateAccessToken(userjwt);
         //    const refreshToken = jwt.sign(userjwt, process.env.REFRESH_TOKEN_SECRET);
-            res.json({accesstoken: accessToken});
+            res.json({userid:user.id, accesstoken: accessToken});
         } else {
             res.sendStatus(412); // status to imply The pre condition given in the request evaluated to false by the server.
         }

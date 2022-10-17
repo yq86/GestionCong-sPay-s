@@ -1,11 +1,14 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, TemplateRef, } from '@angular/core';
+import { MatDialogModule } from '@angular/material/dialog';
+import { Component, Inject, OnInit, ChangeDetectionStrategy, ViewChild, TemplateRef } from '@angular/core';
 import { startOfDay, endOfDay, subDays, addDays, endOfMonth, isSameDay, isSameMonth, addHours } from 'date-fns';
 import { Subject } from 'rxjs';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarEvent, CalendarEventAction, CalendarEventTimesChangedEvent,CalendarView } from 'angular-calendar';
 import { EventColor } from 'calendar-utils';
 import { FlatpickrModule } from 'angularx-flatpickr';
 import flatpickr from "flatpickr";
+import { DemandeDateComponent } from '../demande-date/demande-date.component';
 
 
 const colors: Record<string, EventColor> = {
@@ -31,21 +34,26 @@ const colors: Record<string, EventColor> = {
 })
 export class DemandesComponent implements OnInit {
 
-    constructor(
-              private modalService: NgbModal
+  modalContent!: TemplateRef<any>;
+  view: CalendarView = CalendarView.Month;
+  CalendarView = CalendarView;
+  userId!: string | null;
+  startingDate!: Date;
+  endingDate!: Date;
+  typeId!: number;
+  viewDate: Date = new Date();
+
+
+  constructor(
+    private modalService: NgbModal,
+    private dialogService: MatDialog
     ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.userId = localStorage.getItem("id");
+  }
 
   @ViewChild('modalContent', { static: true })
-  modalContent!: TemplateRef<any>;
-
-
-  view: CalendarView = CalendarView.Month;
-
-  CalendarView = CalendarView;
-
-  viewDate: Date = new Date();
 
   modalData!: {
     action: string;
@@ -136,6 +144,16 @@ export class DemandesComponent implements OnInit {
   }
 
   addEvent(): void {
+
+    const modalRef = this.dialogService.open(DemandeDateComponent, {
+      width: '600px',
+      height: '400px',
+      data: {UserId: this.userId, startingDate: this.startingDate, endingDate: this.endingDate, TypeId: this.typeId}
+    });
+    modalRef.afterClosed().subscribe(result => {
+      console.log(result)
+      // to create request
+    })
 
     this.events = [
       //...this.events,
