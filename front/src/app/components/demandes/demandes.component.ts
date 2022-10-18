@@ -43,8 +43,8 @@ export class DemandesComponent implements OnInit {
   endingDate!: Date;
   typeId!: number;
   viewDate: Date = new Date();
-  //demandes!: [];
   types: Array<any> = [];
+  activeDayIsOpen: boolean = true;
 
   events: CalendarEvent[] = [
     // {
@@ -81,7 +81,7 @@ export class DemandesComponent implements OnInit {
 
         console.log(res)
         res.forEach((element: DemandeBody) => {
-          const cEvent: any = {};
+          let cEvent: any = {};
           cEvent.start = startOfDay(new Date(element.startingDate));
           cEvent.end = endOfDay(new Date(element.endingDate));
           const type = this.types.find(type => type.id == element.TypeId);
@@ -100,6 +100,7 @@ export class DemandesComponent implements OnInit {
         });
       }
     });
+    this.activeDayIsOpen = true;
 
   }
 
@@ -130,9 +131,6 @@ export class DemandesComponent implements OnInit {
 
   refresh = new Subject<void>();
 
-
-
-  activeDayIsOpen: boolean = true;
 
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {

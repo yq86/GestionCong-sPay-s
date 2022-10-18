@@ -26,6 +26,13 @@ export class DemandeService {
     return this.http.get<any>(`${this.apiServerUrl}/demandes/getByIdUser/`+idUser, options);
   }
 
+  public getDemandes(token: any): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
+    }
+    return this.http.get<any>(`${this.apiServerUrl}/demandes/all`, options);
+  }
+
   public demandeConge(token: any, body:DemandeBody): Observable<any> {
     const options = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
@@ -33,7 +40,18 @@ export class DemandeService {
     return this.http.post<any>(`${this.apiServerUrl}/demandes/`, body, options);
   }
 
+   public deleteDemande(token: any, id: number): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
+    }
+    return this.http.delete<any>(`${this.apiServerUrl}/demandes/deleteById/`+id, options);
+  }
 
-
+  public updateDemande(token: any, body: any): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
+    }
+    return this.http.put<any>(`${this.apiServerUrl}/demandes/update`, body, options);
+  }
 
 }
