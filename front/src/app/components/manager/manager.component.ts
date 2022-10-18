@@ -78,89 +78,50 @@ export class ManagerComponent implements OnInit {
         Swal.fire('Changes are not saved', '', 'info')
       }
     })
-
-
-
-
   };
 
 
   modifyDemande(id: number, statusId: number) {
-
     Swal.fire({
       title: 'Do you want to modify the demande?',
       text:"specify the reason if you want to refuse this demande",
       input: 'text',
       showCancelButton: true,
       confirmButtonText: 'Save',
-      icon: 'warning',
-
+      type: 'warning',
     } as any).then((result) => {
+
       /* Read more about isConfirmed, isDenied below */
-      if (result.value) {
+      if (result.dismiss) {
+        Swal.fire('Changes are not saved', '', 'info')
+      } else {
+        console.log(result)
         let body: any = {};
         body.id = id;
         body.StatusId = statusId;
-        this.demandeService.updateDemande(this.token, body).subscribe((res) => {
-          console.log(res);
-        })
+        body.description = result.value;
+
         const de = this.demandes.find(el => el.id = id);
         if (de && statusId==2) {
           de.status = "validée";
+          de.description = result.value;
+          this.demandeService.updateDemande(this.token, body);
+          Swal.fire('Saved!', '', 'success')
         } else if (de && statusId == 3) {
           de.status = "refusée";
           de.description = result.value;
-          //
+          if (result.value == "") {
+            Swal.fire({
+              title: 'Error! Please specify the reason of refuse!',
+              type: 'error'
+            } as any)
+          } else {
+            this.demandeService.updateDemande(this.token, body);
+          Swal.fire('Saved!', '', 'success')
+          }
         }
         this.dataSource = new MatTableDataSource(this.demandes);
-
-        Swal.fire('Saved!', '', 'success')
-
-      } else if (result.dismiss) {
-        Swal.fire('Changes are not saved', '', 'info')
       }
     })
-
-
-
   }
-
-
-  //  modifyDemande(id: number, statusId: number) {
-
-  //   Swal.fire({
-  //     title: 'Do you want to modify the demande?',
-  //     showCancelButton: true,
-  //     confirmButtonText: 'Save',
-  //     icon: 'warning',
-
-  //   } as any).then((result) => {
-  //     /* Read more about isConfirmed, isDenied below */
-  //     if (result.value) {
-  //       let body: any = {};
-  //       body.id = id;
-  //       body.StatusId = statusId;
-  //       console.log(body)
-  //       this.demandeService.updateDemande(this.token, body).subscribe((res) => {
-  //         console.log(res);
-  //       })
-  //       const de = this.demandes.find(el => el.id = id);
-  //       if (de && statusId==2) {
-  //         de.status = "validée";
-  //       } else if (de && statusId == 3) {
-  //         de.status = "refusée";
-  //       }
-  //       this.dataSource = new MatTableDataSource(this.demandes);
-
-  //       Swal.fire('Saved!', '', 'success')
-
-  //     } else if (result.dismiss) {
-  //       Swal.fire('Changes are not saved', '', 'info')
-  //     }
-  //   })
-
-
-
-  // }
-
 }

@@ -47,11 +47,11 @@ export class DemandeService {
     return this.http.delete<any>(`${this.apiServerUrl}/demandes/deleteById/`+id, options);
   }
 
-  public updateDemande(token: any, body: any): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
+  public updateDemande(token: any, body: any) { // need to post the access token to the backend to get the rights to access the database;
     const options = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
     }
-    return this.http.put<any>(`${this.apiServerUrl}/demandes/update`, body, options);
+    return this.http.put<any>(`${this.apiServerUrl}/demandes/update`, body, options).subscribe((res) => {});
   }
 
 }

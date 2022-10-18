@@ -41,7 +41,7 @@ exports.createUser = async (req, res) => {
                 
                 Holidays.create(holiday); //to create this employee's paid leaves
             }    
-            res.sendStatus(200); // status object created
+            res.status(200); // status object created
         });    
     } catch (error) {
         res.send(error);
@@ -130,7 +130,7 @@ function generateAccessToken(user) {
 
 exports.userLogOut = async (req, res) => {
     refreshTokens = refreshTokens.filter(token => token !== req.body.token);
-    res.sendStatus(204); // status no content
+    res.status(204); // status no content
 };
 
 
@@ -156,7 +156,7 @@ exports.deleteUserById = async (req, res) => {
         }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        res.sendStatus(200);   // status request ok  
+        res.status(200);   // status request ok  
     }catch (error) {
         res.send(error);
     }finally{
@@ -194,7 +194,7 @@ exports.updateUser = async (req, res) => {
                 const newUser = await Users.findByPk(id, {
                     include: [ Holidays]
                 }); */
-                res.sendStatus(200);
+                res.status(200);
             });
         } else {
             res.send(400, "user doesn't exist");
@@ -223,7 +223,7 @@ exports.updateUserHoliday = async (req, res) => {
                 }
             });  
         }
-        res.sendStatus(200) ;
+        res.status(200) ;
     }catch (error) {
         res.send(error);
     }finally{
