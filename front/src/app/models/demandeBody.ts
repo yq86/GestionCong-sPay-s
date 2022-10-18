@@ -2,5 +2,6 @@ export interface DemandeBody {
   UserId: number;
   startingDate: Date;
   endingDate: Date;
-  TypeId : number
+  TypeId: number
+  StatusId: number;
 }

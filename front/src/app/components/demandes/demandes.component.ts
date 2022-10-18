@@ -1,14 +1,14 @@
-import { MatDialogModule } from '@angular/material/dialog';
-import { Component, Inject, OnInit, ChangeDetectionStrategy, ViewChild, TemplateRef } from '@angular/core';
-import { startOfDay, endOfDay, subDays, addDays, endOfMonth, isSameDay, isSameMonth, addHours } from 'date-fns';
+import { Component,  OnInit, ChangeDetectionStrategy, ViewChild, TemplateRef} from '@angular/core';
+import { startOfDay, endOfDay,isSameDay, isSameMonth, parseISO } from 'date-fns';
 import { Subject } from 'rxjs';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarEvent, CalendarEventAction, CalendarEventTimesChangedEvent,CalendarView } from 'angular-calendar';
 import { EventColor } from 'calendar-utils';
-import { FlatpickrModule } from 'angularx-flatpickr';
-import flatpickr from "flatpickr";
 import { DemandeDateComponent } from '../demande-date/demande-date.component';
+import { DemandeService } from '../../services/demande.service';
+import { DemandeBody } from 'src/app/models/demandeBody';
+import { TypesService } from 'src/app/services/types.service';
 
 
 const colors: Record<string, EventColor> = {
@@ -38,19 +38,69 @@ export class DemandesComponent implements OnInit {
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
   userId!: string | null;
+  token!: string | null;
   startingDate!: Date;
   endingDate!: Date;
   typeId!: number;
   viewDate: Date = new Date();
+  //demandes!: [];
+  types: Array<any> = [];
+
+  events: CalendarEvent[] = [
+    // {
+    //   start: subDays(startOfDay(new Date()), 1)subDays(startOfDay(new Date()), 1),
+    //   end: addDays(new Date(), 1),
+    //   title: 'A 3 day event',
+    //   color: { ...colors['sent'] },
+    //   actions: this.actions,
+    //   allDay: true,
+
+    // }
+
+  ];
 
 
   constructor(
     private modalService: NgbModal,
-    private dialogService: MatDialog
+    private dialogService: MatDialog,
+    private demandeService: DemandeService,
+    private typeService: TypesService,
     ) { }
 
   ngOnInit(): void {
     this.userId = localStorage.getItem("id");
+    this.token = localStorage.getItem("accessToken");
+    this.typeService.getAllTypes(this.token).subscribe(
+      (response: any) => {
+        this.types = response;
+      }
+    );
+    this.events = [];
+    this.demandeService.getUserDemandes(this.token, this.userId).subscribe((res) => {
+      if (res) {
+
+        console.log(res)
+        res.forEach((element: DemandeBody) => {
+          const cEvent: any = {};
+          cEvent.start = startOfDay(new Date(element.startingDate));
+          cEvent.end = endOfDay(new Date(element.endingDate));
+          const type = this.types.find(type => type.id == element.TypeId);
+          cEvent.title = type.name;
+          if (element.StatusId == 1) {
+            cEvent.color = { ...colors['sent'] };
+          } else if (element.StatusId == 2) {
+            cEvent.color = { ...colors['validate'] };
+          } else if (element.StatusId == 3) {
+            cEvent.color = { ...colors['refuse'] };
+          }
+
+          cEvent.actions = this.actions;
+          cEvent.allDay = true;
+          this.events.push(cEvent);
+        });
+      }
+    });
+
   }
 
   @ViewChild('modalContent', { static: true })
@@ -80,28 +130,7 @@ export class DemandesComponent implements OnInit {
 
   refresh = new Subject<void>();
 
-  events: CalendarEvent[] = [
-    {
-      start: subDays(startOfDay(new Date()), 1),
-      end: addDays(new Date(), 1),
-      title: 'A 3 day event',
-      color: { ...colors['sent'] },
-      actions: this.actions,
-      allDay: true,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true,
-      },
-      draggable: true,
-    },
-    {
-      start: startOfDay(new Date()),
-      title: 'An event with no end date',
-      color: { ...colors['validate'] },
-      actions: this.actions,
-    },
 
-  ];
 
   activeDayIsOpen: boolean = true;
 
@@ -151,8 +180,29 @@ export class DemandesComponent implements OnInit {
       data: {UserId: this.userId, startingDate: this.startingDate, endingDate: this.endingDate, TypeId: this.typeId}
     });
     modalRef.afterClosed().subscribe(result => {
-      console.log(result)
-      // to create request
+      if (result) {
+        const dateStart = new Date(result.startingDate);
+        const ddStart = String(dateStart.getDate()).padStart(2, '0');
+        const mmStart = String(dateStart.getMonth() + 1).padStart(2, '0');
+        const yyyyStart = dateStart.getFullYear();
+        const start = yyyyStart + '-' + mmStart + '-' + ddStart;
+
+        const dateEnd = new Date(result.endingDate);
+        const ddEnd = String(dateEnd.getDate()).padStart(2, '0');
+        const mmEnd = String(dateEnd.getMonth() + 1).padStart(2, '0');
+        const yyyyEnd = dateEnd.getFullYear();
+        const end = yyyyEnd + '-' + mmEnd + '-' + ddEnd;
+        result.startingDate = start;
+        result.endingDate = end;
+        // to create request
+
+        this.demandeService.demandeConge(this.token, result).subscribe((res) => {
+          console.log(res);
+        });
+      }
+
+
+
     })
 
     this.events = [
