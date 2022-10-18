@@ -36,11 +36,11 @@ export class DemandeDateComponent implements OnInit {
   }
 
   addDemande() {
-
     Swal.fire({
       title: 'Do you want to save the changes?',
       showCancelButton: true,
       confirmButtonText: 'Save',
+      type: "warning"
     } as any).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.value) {
