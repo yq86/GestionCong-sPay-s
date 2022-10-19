@@ -7,6 +7,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { ManagerComponent } from './components/manager/manager.component';
 import { AuthGuardService as AuthGuard } from './auth/auth-guard.service';
 import { RoleGuardService as RoleGuard } from './auth/role-guard.service';
+import { HomeComponent } from './components/home/home.component';
 
 const routes: Routes = [];
 
@@ -16,8 +17,12 @@ const routes: Routes = [];
     RouterModule.forRoot([
       {
         path: '',
-        redirectTo: 'login',
+        redirectTo: 'home',
         pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        component: HomeComponent
       },
       {
         path: 'login',
@@ -33,7 +38,7 @@ const routes: Routes = [];
         component: ManagerComponent,
         canActivate: [RoleGuard],
         data: {
-          role: '2', 
+          role: '2',
           role2: '1'
         }
       },

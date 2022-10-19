@@ -15,6 +15,8 @@ import { FlatpickrModule } from 'angularx-flatpickr';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { DemandeDateComponent } from './components/demande-date/demande-date.component';
+import { CommonModule } from '@angular/common';
+import { HomeComponent } from './components/home/home.component';
 
 
 @NgModule({
@@ -26,10 +28,12 @@ import { DemandeDateComponent } from './components/demande-date/demande-date.com
     DemandesComponent,
     AdminComponent,
     ManagerComponent,
-    DemandeDateComponent
+    DemandeDateComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MaterialModule,

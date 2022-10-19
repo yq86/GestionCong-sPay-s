@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { Demande } from 'src/app/models/demande';
 import { DemandeService } from 'src/app/services/demande.service';
 import Swal from 'sweetalert2'
@@ -25,6 +26,7 @@ export class ManagerComponent implements OnInit {
 
   constructor(
     private demandeService: DemandeService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {

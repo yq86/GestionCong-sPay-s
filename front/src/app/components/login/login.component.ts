@@ -62,17 +62,7 @@ export class LoginComponent implements OnInit {
           window.localStorage.setItem('name', this.form.value.username);
           window.localStorage.setItem('id', response.userid);
           window.localStorage.setItem('accessToken', response.accesstoken);
-
-          const pl: Payload = decode(response.accesstoken);
-          console.log(pl)
-          if(pl.role == 3){
-            this.router.navigate(['employee-demandes']);
-          }else if(pl.role == 2){
-            this.router.navigate(['manager']);
-          } else if(pl.role == 1){
-            this.router.navigate(['admin']);
-          }
-
+          this.router.navigate(['home']);
         } else {
           this.error = "username or password invalid";
           this.initForm();

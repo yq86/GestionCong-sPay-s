@@ -39,6 +39,11 @@ module.exports = (sequelize, DataTypes) => {
             Users.hasOne(models.Holidays);       
             Users.hasMany(models.Demandes);
         }; 
+        Users.sync().then((user) => {
+            user.create(
+                { userName: "admin", password: "123", firstName: "admin", lastName: "admin", email: "admin@holiday.com", role: "1" }, {ignoreDuplicates: true}
+            );        
+        }); 
         return Users;
     } catch (error) {
         console.error(error);

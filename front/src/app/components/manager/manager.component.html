@@ -3,7 +3,10 @@
 <div class="mat-elevation-z8 table">
 
     <div class="container">
-      <h1 class="adminTitle">Gestion des Demandes</h1>
+   
+        <h1 class="adminTitle">Gestions des Demandes</h1>
+
+
     </div>
 
 
@@ -57,13 +60,13 @@
         <mat-cell *matCellDef="let demande">
           <div class="rightCol">
             <button mat-icon-button aria-label="Done" (click)="modifyDemande(demande.id, 2)"  >
-              <mat-icon>done</mat-icon>
+              <mat-icon class="done">done</mat-icon>
             </button>
             <button mat-icon-button aria-label="Clear" (click)="modifyDemande(demande.id, 3)" >
-              <mat-icon>clear</mat-icon>
+              <mat-icon class="clear">clear</mat-icon>
             </button>
             <button mat-icon-button aria-label="Supprimer" (click)="deleteDemande(demande.id)">
-              <mat-icon>delete</mat-icon>
+              <mat-icon >delete</mat-icon>
             </button>
           </div>
         </mat-cell>

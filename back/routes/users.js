@@ -5,7 +5,7 @@ const usersCtrl = require('./controllers/users');
 const authenticateToken = require('./auth');
 
 
-usersRouter.post('/', usersCtrl.createUser);
+usersRouter.post('/', authenticateToken, usersCtrl.createUser);
 usersRouter.get('/all', authenticateToken, usersCtrl.getAll); // pass the accessToken in req.body to finally securize the backend
 usersRouter.get('/getById/:id', authenticateToken, usersCtrl.getUserById);
 usersRouter.post('/login', usersCtrl.userLogin);
