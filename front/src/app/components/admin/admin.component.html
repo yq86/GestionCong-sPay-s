@@ -5,65 +5,60 @@
     <div class="container">
       <h1 class="adminTitle">Gestions des Users</h1>
     </div>
-
+    <div class="addContainer">
+      <button mat-raised-button class="add" (click)="addUser()" ><mat-icon>add</mat-icon>New User</button>
+    </div>
 
   <mat-table [dataSource]="dataSource">
+
+    <!-- userName Column -->
+    <ng-container matColumnDef="userName">
+      <mat-header-cell *matHeaderCellDef> UserName </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.userName}} </mat-cell>
+    </ng-container>
 
     <!-- firstName Column -->
     <ng-container matColumnDef="firstName">
       <mat-header-cell *matHeaderCellDef> firstName </mat-header-cell>
-      <mat-cell *matCellDef="let demande"> {{demande.firstName}} </mat-cell>
+      <mat-cell *matCellDef="let user"> {{user.firstName}} </mat-cell>
     </ng-container>
 
     <!-- lastName Column -->
     <ng-container matColumnDef="lastName">
       <mat-header-cell *matHeaderCellDef> lastName </mat-header-cell>
-      <mat-cell *matCellDef="let demande"> {{demande.lastName}} </mat-cell>
+      <mat-cell *matCellDef="let user"> {{user.lastName}} </mat-cell>
     </ng-container>
 
-    <!-- startingDate Column -->
-    <ng-container matColumnDef="startingDate">
-      <mat-header-cell *matHeaderCellDef> startingDate </mat-header-cell>
-      <mat-cell *matCellDef="let demande"> {{demande.startingDate}} </mat-cell>
-    </ng-container>
+
 
     <!-- endingDate Column -->
-    <ng-container matColumnDef="endingDate">
-      <mat-header-cell *matHeaderCellDef> endingDate </mat-header-cell>
-      <mat-cell *matCellDef="let demande"> {{demande.endingDate}} </mat-cell>
+    <ng-container matColumnDef="email">
+      <mat-header-cell *matHeaderCellDef> email </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.email}} </mat-cell>
     </ng-container>
 
     <!-- description Column -->
-    <ng-container matColumnDef="description refuse">
-      <mat-header-cell *matHeaderCellDef> description refuse </mat-header-cell>
-      <mat-cell *matCellDef="let demande"> {{demande.description}} </mat-cell>
+    <ng-container matColumnDef="role">
+      <mat-header-cell *matHeaderCellDef> role </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.role}} </mat-cell>
     </ng-container>
 
     <!-- type Column -->
-    <ng-container matColumnDef="type">
-      <mat-header-cell *matHeaderCellDef> type </mat-header-cell>
-      <mat-cell *matCellDef="let demande"> {{demande.type}} </mat-cell>
-    </ng-container>
-
-    <!-- status Column -->
-    <ng-container matColumnDef="status">
-      <mat-header-cell *matHeaderCellDef> status </mat-header-cell>
-      <mat-cell *matCellDef="let demande"> {{demande.status}} </mat-cell>
+    <ng-container matColumnDef="firstWorkingDay">
+      <mat-header-cell *matHeaderCellDef> firstWorkingDay </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.firstWorkingDay | date:'yyyy-MM-dd'}} </mat-cell>
     </ng-container>
 
     <!-- Edit Column -->
     <ng-container matColumnDef="edit">
         <mat-header-cell *matHeaderCellDef></mat-header-cell>
-        <mat-cell *matCellDef="let demande">
+        <mat-cell *matCellDef="let user">
           <div class="rightCol">
             <button mat-icon-button aria-label="Done"   >
-              <mat-icon>done</mat-icon>
+              <mat-icon class="edit" (click)="modifyUser(user.id)">edit</mat-icon>
             </button>
-            <button mat-icon-button aria-label="Clear"  >
-              <mat-icon>clear</mat-icon>
-            </button>
-            <button mat-icon-button aria-label="Supprimer" >
-              <mat-icon>delete</mat-icon>
+            <button mat-icon-button aria-label="Supprimer" (click)="deleteUser(user.id)">
+              <mat-icon class="delete">delete</mat-icon>
             </button>
           </div>
         </mat-cell>
@@ -75,6 +70,6 @@
 
   <mat-paginator [pageSizeOptions]="[5, 10, 20]"
     showFirstLastButtons
-    aria-label="Select page of periodic demandes">
+    aria-label="Select page of periodic users">
   </mat-paginator>
 </div>

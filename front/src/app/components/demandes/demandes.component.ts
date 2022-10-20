@@ -9,7 +9,7 @@ import { DemandeDateComponent } from '../demande-date/demande-date.component';
 import { DemandeService } from '../../services/demande.service';
 import { DemandeBody } from 'src/app/models/demandeBody';
 import { TypesService } from 'src/app/services/types.service';
-
+import Swal from 'sweetalert2'
 
 const colors: Record<string, EventColor> = {
 
@@ -78,8 +78,6 @@ export class DemandesComponent implements OnInit {
     this.events = [];
     this.demandeService.getUserDemandes(this.token, this.userId).subscribe((res) => {
       if (res) {
-
-        console.log(res)
         res.forEach((element: DemandeBody) => {
           let cEvent: any = {};
           cEvent.start = startOfDay(new Date(element.startingDate));
@@ -194,29 +192,24 @@ export class DemandesComponent implements OnInit {
         result.endingDate = end;
         // to create request
 
-        this.demandeService.demandeConge(this.token, result).subscribe((res) => {
-          console.log(res);
-        });
+        this.demandeService.demandeConge(this.token, result).subscribe(
+          (res) => {
+          console.log(res)
+          },
+          (err) => {
+            if (err.error) {
+              setTimeout(() => {
+                Swal.fire({
+                  title: err.error,
+                  confirmButtonText: 'Ok',
+                  type: "warning"
+                })
+              }, 1000)
+            }
+          });
       }
-
-
-
     })
-
-    this.events = [
-      //...this.events,
-      {
-        title: 'New event',
-        start: startOfDay(new Date()),
-        end: endOfDay(new Date()),
-        color: colors['sent'],
-        draggable: true,
-        resizable: {
-          beforeStart: true,
-          afterEnd: true,
-        },
-      },
-    ];
+    this.events = [];
   }
 
   deleteEvent(eventToDelete: CalendarEvent) {

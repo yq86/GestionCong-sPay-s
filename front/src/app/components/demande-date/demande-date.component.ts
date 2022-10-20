@@ -21,11 +21,9 @@ export class DemandeDateComponent implements OnInit {
 
   ngOnInit(): void {
     this.token = localStorage.getItem("accessToken");
-    console.log(this.token)
     this.typesService.getAllTypes(this.token).subscribe(
       (response: any) => {
         this.types = response;
-        console.log(this.types);
       }
     )
   }

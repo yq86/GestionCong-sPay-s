@@ -1,9 +1,12 @@
 .table{
-  margin-top: 100px;
+  margin-top: 200px;
+  width: 95%;
+  margin-left: 2.5%;
 }
 
 .container {
   text-align: center;
+  padding-top: 20px;
 }
 
 .rightCol{
@@ -11,3 +14,22 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.add {
+  background-color: #20647a;
+  color: white;
+  margin-bottom: 20px;
+  margin-left: 90%;
+}
+
+
+.edit {
+  color: rgb(39, 122, 231);
+}
+
+.delete {
+  color: rgb(233, 109, 56);
+}
+
+
+

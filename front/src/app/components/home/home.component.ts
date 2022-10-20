@@ -21,7 +21,6 @@ export class HomeComponent implements OnInit {
       const pl: Payload = decode(token);
       this.role = pl.role;
     }
-    console.log(this.role);
   }
 
   redirect(roler: number) {

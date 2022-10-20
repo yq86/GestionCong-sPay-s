@@ -17,6 +17,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { DemandeDateComponent } from './components/demande-date/demande-date.component';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './components/home/home.component';
+import { AddEditUserComponent } from './components/add-edit-user/add-edit-user.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { HomeComponent } from './components/home/home.component';
     AdminComponent,
     ManagerComponent,
     DemandeDateComponent,
-    HomeComponent
+    HomeComponent,
+    AddEditUserComponent
   ],
   imports: [
     BrowserModule,

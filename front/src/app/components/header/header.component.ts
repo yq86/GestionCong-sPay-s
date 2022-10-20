@@ -14,14 +14,12 @@ export class HeaderComponent implements AfterViewInit {
     private router: Router
   ) { }
   ngAfterViewInit(): void {
-      console.log(this.username)
       const userid = localStorage.getItem("id");
       const token = localStorage.getItem("accessToken");
       if (userid && token) {
       this.userService.getUserById(userid, token).subscribe((res) => {
-        console.log(res)
+
         this.username = res.firstName + ' ' + res.lastName;
-        console.log(this.username)
       })
     }
   }

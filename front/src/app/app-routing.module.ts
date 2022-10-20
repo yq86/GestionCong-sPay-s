@@ -22,7 +22,8 @@ const routes: Routes = [];
       },
       {
         path: 'home',
-        component: HomeComponent
+        component: HomeComponent,
+        canActivate: [AuthGuard]
       },
       {
         path: 'login',

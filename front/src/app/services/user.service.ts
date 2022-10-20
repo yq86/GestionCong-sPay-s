@@ -22,8 +22,29 @@ export class UserService {
     return this.http.post<any>(`${this.apiServerUrl}/users/login`,user, this.httpOptions) ;
   }
 
-   public signout(user: UserLogin): Observable<any> {
+  public signout(user: UserLogin): Observable<any> {
     return this.http.post<any>(`${this.apiServerUrl}/users/login`,user, this.httpOptions) ;
+  }
+
+  public deleteUser(id: number, token: any): Observable<any> {
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
+    }
+    return this.http.delete<any>(`${this.apiServerUrl}/users/deleteById/`+ id, options) ;
+  }
+
+  public addUser(user: any, token: any): Observable<any> {
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
+    }
+    return this.http.post<any>(`${this.apiServerUrl}/users/`, user, options) ;
+  }
+
+  public modifyUser(user: any, token: any): Observable<any> {
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token })
+    }
+    return this.http.post<any>(`${this.apiServerUrl}/users/`, user, options) ;
   }
 
   public getAllUsers(token: any): Observable<any> { // need to post the access token to the backend to get the rights to access the database;
