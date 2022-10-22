@@ -6,7 +6,7 @@ describe("demandes CRUD", () => {
         await request(ap)
             .post("/demandes/create")
             .send({
-                "UserId": "1",
+                "UserId": "345",
                 "startingDate": "2022-10-20",
                 "endingDate": "2022-10-21",
                 "TypeId": "1"
@@ -40,7 +40,7 @@ describe("demandes CRUD", () => {
 
     it("GET demande by id ", async () => {
         await request(ap)
-            .get("/demandes/getById/" + 1)
+            .get("/demandes/getById/" + 10)
             .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
@@ -85,7 +85,7 @@ describe("demandes CRUD", () => {
         await request(ap)
             .put("/demandes/update")
             .send({
-                "id": 1,
+                "id": 10,
                 "startingDate": "2022-10-20T00:00:00.000Z",
                 "endingDate": "2022-10-21T00:00:00.000Z",
                 "description": null,
@@ -106,4 +106,4 @@ describe("demandes CRUD", () => {
                 );
             });
     });
-});
+}); 

@@ -12,32 +12,43 @@ const cron = require('node-cron');
 exports.createDemande = async (req, res) => {
     try{
         const demande = req.body;
-        console.log(demande.TypeId);
         demande.StatusId = 1;
         const idUser = req.body.UserId;   
-        const holiday = await Holidays.findByPk(idUser);
-        const date1 = new Date(demande.startingDate);
-        const date2 = new Date(demande.endingDate); 
-        const daysDemande = Math.ceil((date2.getTime() - date1.getTime())/ (1000 * 3600 * 24)+1);
-       // res.json(daysDemande)
-        if(demande.TypeId ==1 && holiday.holidaysAvailable >= daysDemande){ // if user has enough holidays
-            await Demandes.create(demande).then(createdDemande=>{ // create demande
-                res.json(createdDemande); // return created demande
-            }); 
-        } else if(demande.TypeId == 1 && holiday.holidaysAvailable < daysDemande){ // if user doesnt have enough holidays
-            res.json("you dont have available holidays");
-        } else if(demande.TypeId != 1){ // si demande d'autre type de congés payés
-            // create demande
-            await Demandes.create(demande).then(async (createdDemande)=>{
-                const idDemande = createdDemande.id;
-                const newDemande = await  Demandes.findByPk(idDemande, {
-                    include: [ Types, Statuses, Users]
+        const user = await Users.findByPk(idUser);
+        if (user) {
+            const holiday = await Holidays.findOne({
+                where: {
+                    UserId: [idUser]
+                }
+            });
+        
+            const date1 = new Date(demande.startingDate);
+            const date2 = new Date(demande.endingDate);
+            const daysDemande = Math.ceil((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24) + 1);
+            // res.json(daysDemande)
+            if (demande.TypeId == 1 && holiday.holidaysAvailable >= daysDemande) { // if user has enough holidays
+                await Demandes.create(demande).then(createdDemande => { // create demande
+                    res.status(201); // return status Created
                 });
-                res.json(newDemande); // return created demande 
-            }); 
-        }
+            } else if (demande.TypeId == 1 && holiday.holidaysAvailable < daysDemande) { // if user doesnt have enough holidays
+                res.send(400, "you dont have enough holidays");
+            } else if (demande.TypeId != 1) { // si demande d'autre type de congés payés
+                // create demande
+                await Demandes.create(demande).then(async (createdDemande) => {
+                    /*const idDemande = createdDemande.id;
+                    const newDemande = await Demandes.findByPk(idDemande, {
+                        include: [Types, Statuses, Users]
+                    }); */
+                    res.send(201); // return status Created
+                });
+            }
+        } else {
+            res.send(400, "user does not exist");
+        }    
     } catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -50,6 +61,8 @@ exports.getAllDemandes = async (req, res) => {
         res.json(demandes); // to return the list of users
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -63,6 +76,8 @@ exports.getDemandeById = async (req, res) => {
         res.json(demande); 
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     } 
 
 };
@@ -80,6 +95,8 @@ exports.getDemandeByIdUser = async (req, res) => {
         res.json(demandes); 
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     } 
 };
 
@@ -96,18 +113,21 @@ exports.deleteDemandeById = async (req, res) => {
                         id: [id]
                     }
                 });
+                /*
                 const demandes = await Demandes.findAll({
                     include: [ Users, Types, Statuses ]
-                });
-                res.json(demandes);
+                }); */
+                res.status(200);
             } else {
-                res.json("demande accepted, can not be deleted");
+                res.send(400, "demande accepted, can not be deleted");
             }    
         }else {
-            res.json("demande doesn't exist");
+            res.send(400, "demande doesn't exist");
         }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -116,68 +136,90 @@ exports.updateDemande = async (req, res) => {
     try {
         const id = req.body.id;
         const demandeOriginal = await Demandes.findByPk(id);
-        const objDemande = req.body; 
-        const iduser = demandeOriginal.UserId;
-        const idtype = demandeOriginal.TypeId;
-        const status = req.body.StatusId;
-        const description = req.body.description;           
-        delete objDemande.id;
-        if(status == 3){  // if refuse
-            if(!description){ // description required
-                res.json("please specify the reason of refuse");
-            } else {
-                await Demandes.update(objDemande, { // to update demande
-                    where : {id: [id]}
+        if (demandeOriginal) {
+            const objDemande = req.body;
+            const iduser = demandeOriginal.UserId;
+            const idtype = demandeOriginal.TypeId;
+            const status = req.body.StatusId;
+            const description = req.body.description;
+            delete objDemande.id;
+            if (status == 3) {  // if refuse
+                if (!description) { // description required
+
+                    res.send(400, "please specify the reason of refuse");
+                    
+                 //   res.json("please specify the reason of refuse");
+                } else {
+                    await Demandes.update(objDemande, { // to update demande
+                        where: { id: [id] }
+                    });
+                    // to send email to user
+                    sendEmailToEmployee(iduser, id);
+                    /*
+                    const demande = await Demandes.findByPk(id, {
+                        include: [Users, Types, Statuses]
+                    }); */
+                    res.status(200); // return status ok
+                }
+            } else if (status == 2 && idtype == 1) { // if congé payé normale accepted
+                await Demandes.update(objDemande, { // update demande status
+                    where: { id: [id] }
+                });
+                // to update holiday
+                const holiday = await Holidays.findOne({
+                    where: { UserId: iduser }
+                });
+                const date1 = new Date(demandeOriginal.startingDate);
+                const date2 = new Date(demandeOriginal.endingDate);
+                const daysDemande = Math.ceil((date2.getTime() - date1.getTime()) / (1000 * 3600 * 24) + 1);
+                const holidaysAvb = holiday.holidaysAvailable - daysDemande;
+                const holidaysTaken = holiday.holidaysTaken + daysDemande;
+                const holidayUpdate = {
+                    "holidaysAvailable": holidaysAvb,
+                    "holidaysTaken": holidaysTaken
+                };
+                await Holidays.update(holidayUpdate, {    // update holiday
+                    where: {
+                        UserId: iduser
+                    },
                 });
                 // to send email to user
                 sendEmailToEmployee(iduser, id);
+                /*
                 const demande = await Demandes.findByPk(id, {
-                    include: [ Users, Types, Statuses]
+                    include: [Users, Types, Statuses]
+                });*/
+                res.status(200);
+            } else if (status == 2 && idtype != 1) { // if other type(maladie...) congé payé accepted
+                await Demandes.update(objDemande, { // update demande status
+                    where: { id: [id] }
                 });
-                res.json(demande); // return updated demande
+                /*
+                const demande = await Demandes.findByPk(id, {
+                    include: [Users, Types, Statuses]
+                });*/
+                // to send email to user
+                sendEmailToEmployee(iduser, id);
+                res.status(200);
+            } else if (status == 1) {
+                await Demandes.update(objDemande, { // to update demande
+                        where: { id: [id] }
+                    });
+                    // to send email to user
+                sendEmailToEmployee(iduser, id);
+                /*
+                    const demande = await Demandes.findByPk(id, {
+                        include: [Users, Types, Statuses]
+                    }); */
+                    res.status(200); // return updated demande
             }
-        } else if(status == 2 && idtype == 1 ){ // if congé payé normale accepted
-            await Demandes.update(objDemande, { // update demande status
-                where : {id: [id]}
-            });
-            // to update holiday
-            const holiday = await Holidays.findOne({
-                where: {UserId: iduser}});
-            const date1 = new Date(demandeOriginal.startingDate);
-            const date2 = new Date(demandeOriginal.endingDate);     
-            const daysDemande = Math.ceil((date2.getTime() - date1.getTime())/ (1000 * 3600 * 24)+1);
-            const holidaysAvb = holiday.holidaysAvailable-daysDemande;
-            const holidaysTaken = holiday.holidaysTaken + daysDemande;
-            const holidayUpdate = {
-                "holidaysAvailable": holidaysAvb, 
-                "holidaysTaken": holidaysTaken
-                };
-            await Holidays.update(holidayUpdate,{    // update holiday
-                where: { 
-                    UserId : iduser
-                }, 
-            });
-            // to send email to user
-            sendEmailToEmployee(iduser, id);
-            const demande = await Demandes.findByPk(id, {
-                include: [ Users, Types, Statuses ]
-            });
-            res.json(demande);
-        } else if (status == 2 && idtype != 1 ) { // if other type(maladie...) congé payé accepted
-            await Demandes.update(objDemande, { // update demande status
-                where : {id: [id]}
-            });
-            const demande = await Demandes.findByPk(id, {
-                include: [ Users, Types, Statuses]
-            });
-            // to send email to user
-            sendEmailToEmployee(iduser, id);
-            res.json(demande);
-        } else if (status ==1){
-            res.json("status did not change");
+        } else {
+            res.json("demande does not exist");
         }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -247,7 +289,7 @@ async function sendEmailToEmployee(idUser, idDemande){
             }
         });
 
-        message = {
+        let message = {
             from: "request@email.com",
             to: email,
             subject: "Demande congé payé",
@@ -261,9 +303,9 @@ async function sendEmailToEmployee(idUser, idDemande){
             }
         }); 
     }catch(error) {
-        res.send(error);
+        console.log(error);
     }
-};
+}
 
 async function sendEmailToManager(){ 
     try {
@@ -367,7 +409,7 @@ async function sendEmailToManager(){
             }); 
         }
     } catch (error) {
-        res.send(error);
+        console.log(error);
     }
 }
 
@@ -378,7 +420,7 @@ async function deleteDemandesRefused(){
             where: { idStatus: 3}
         });
     }catch (error) {
-        res.send(error);
+        console.log(error);
     }
 }
 
@@ -387,7 +429,7 @@ cron.schedule('00 06 * * 1-5', () => {
     try{
         sendEmailToManager();
     }catch (error) {
-        res.send(error);
+        console.log(error);
     }
     
 });
@@ -397,6 +439,6 @@ cron.schedule('30 06 * * 1-5', () => {
     try{
         deleteDemandesRefused();
     }catch (error) {
-        res.send(error);
+        console.log(error);
     }
 });

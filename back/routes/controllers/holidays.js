@@ -4,18 +4,16 @@ const { Users } = require("../../models");
 
 // to create Holidays
 exports.getAllUsersHolidays = async (req, res) => {
-    try{
+    try {
         const holidays = await Holidays.findAll({
             include: [ Users]
         });
-        if (holidays) {
-            res.json(holidays); // to return the list of holidays
-        } else {
-            res.json("no holidays");
-        }
+        res.json(holidays); // to return the list of holidays
         
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -27,14 +25,11 @@ exports.getHolidayByIdUser = async (req, res) => {
             where: {UserId: [id]}, 
             include: [ Users ]
         });
-        
-        if (holiday) {
-            res.json(holiday); 
-        } else {
-            res.json("holiday does not exist");
-        }
+        res.json(holiday); 
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     } 
 };
 

@@ -1,13 +1,12 @@
 const request = require("supertest");
 const ap = "http://localhost:9090"; 
-const { calculateCongesPayes } = require("../users");
 
 describe("users crud", () => {
     it("POST create a user", async () => {
         await request(ap)
             .post("/users/create")
             .send({
-                "userName": "salarie110",
+                "userName": "sa",
                 "password": "123",
                 "firstName": "Lily",
                 "lastName": "Doe",
@@ -20,7 +19,7 @@ describe("users crud", () => {
             .then((response) => {
                 expect(response.body).toEqual(
                     expect.objectContaining({
-                        password: "123"
+                        userName: "sa"
                     })
                 );
             });
@@ -68,16 +67,16 @@ describe("users crud", () => {
             });
     });
 
-    it("GET user by userName", async () => {
+    it("GET user login", async () => {
         await request(ap)
-            .get("/users/getByUserName")
-            .send({"userName": "salarie110"})
+            .post("/users/login")
+            .send({"userName": "salarie110", "password":"123"})
             .expect('Content-Type', /json/)
             .expect(200)
             .then((response) => {
                 expect(response.body).toEqual(
                     expect.objectContaining({
-                        userName: "salarie110"
+                        accesstoken: expect.any(String)
                     })
                 );
             });
