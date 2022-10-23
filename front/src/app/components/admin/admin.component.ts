@@ -82,50 +82,6 @@ export class AdminComponent implements OnInit {
     })
   };
 
-/*
-  modifyuser(id: number, statusId: number) {
-    Swal.fire({
-      title: 'Do you want to modify the user?',
-      text:"specify the reason if you want to refuse this user",
-      input: 'text',
-      showCancelButton: true,
-      confirmButtonText: 'Save',
-      type: 'warning',
-    } as any).then((result) => {
-*/
-      /* Read more about isConfirmed, isDenied below */
- /*     if (result.dismiss) {
-        Swal.fire('Changes are not saved', '', 'info')
-      } else {
-        console.log(result)
-        let body: any = {};
-        body.id = id;
-        body.StatusId = statusId;
-        body.description = result.value;
-
-        const de = this.users.find(el => el.id = id);
-        if (de && statusId==2) {
-          de.status = "validée";
-          de.description = result.value;
-          this.userService.updateuser(this.token, body);
-          Swal.fire('Saved!', '', 'success')
-        } else if (de && statusId == 3) {
-          de.status = "refusée";
-          de.description = result.value;
-          if (result.value == "") {
-            Swal.fire({
-              title: 'Error! Please specify the reason of refuse!',
-              type: 'error'
-            } as any)
-          } else {
-            this.userService.updateuser(this.token, body);
-          Swal.fire('Saved!', '', 'success')
-          }
-        }
-        this.dataSource = new MatTableDataSource(this.users);
-      }
-    })
-  }*/
 
   addUser() {
     const modalRef = this.dialogService.open(AddEditUserComponent, {
