@@ -7,16 +7,13 @@ pipeline {
         stage('Build Back') {
             steps {
                 sh 'cd back && npm install'
+                sh 'cd back && npm start'
             }
         }
         
-        stage('Deploy Back') {
+        stage('Test Back') {
             steps {
-                sh 'cd back && npm start'
-                
-                timeout(time: 1, unit: 'MINUTES') {
-                    sh 'cd back && npm test'
-                }
+                sh 'cd back && npm test'
             }
         }
         
