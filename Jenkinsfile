@@ -7,7 +7,8 @@ pipeline {
         stage('Build Back') {
             steps {
                 sh 'cd back && npm install'
-                sh 'cd back && screen -d -m -S screen.npmStart npm start'
+                sh 'cd back && npm test'
+                sh 'cd back && npm start'
             }
         }
         
