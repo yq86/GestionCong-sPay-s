@@ -3,7 +3,7 @@
     "username": "root",
     "password": "root",
     "database": "holidayManagement",
-    "host": "127.0.0.1",
+    "host": "mariadb",
     "dialect": "mysql"
   },
   "test": {
