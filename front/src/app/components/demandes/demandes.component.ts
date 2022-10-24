@@ -195,18 +195,7 @@ export class DemandesComponent implements OnInit {
         this.demandeService.demandeConge(this.token, result).subscribe(
           (res) => {
           console.log(res)
-          },
-          (err) => {
-            if (err.error) {
-              setTimeout(() => {
-                Swal.fire({
-                  title: err.error,
-                  confirmButtonText: 'Ok',
-                  type: "warning"
-                })
-              }, 1000)
-            }
-          });
+          }
       }
     })
     this.events = [];
