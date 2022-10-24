@@ -195,7 +195,7 @@ export class DemandesComponent implements OnInit {
         this.demandeService.demandeConge(this.token, result).subscribe(
           (res) => {
           console.log(res)
-          }
+          });
       }
     })
     this.events = [];
