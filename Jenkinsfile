@@ -12,11 +12,11 @@ pipeline {
         
         stage('Deploy Back') {
             steps {
-                dir('/back'){
-                    sh 'npm start'
-                    sh 'npm test'
-                }
+                sh 'cd back && npm start'
                 
+                timeout(time: 1, unit: 'MINUTES') {
+                    sh 'cd back && npm test'
+                }
             }
         }
         
