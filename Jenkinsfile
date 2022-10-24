@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        docker { image 'node:16.13.0' }
+    }
     environment {
         CI = 'true'
     }
