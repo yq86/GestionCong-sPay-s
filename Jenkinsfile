@@ -11,11 +11,11 @@ pipeline {
             }
         }
         
-        stage('Test Back') {
-            steps {
-                sh 'cd back && npm test'
-            }
-        }
+        // stage('Test Back') {
+        //     steps {
+        //         sh 'cd back && npm test'
+        //     }
+        // }
         
         stage('Build Front') {
             steps {
