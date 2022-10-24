@@ -39,7 +39,7 @@ export class DemandeDateComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Save',
       type: "warning"
-    } as any).then((result) => {
+    } as any).then((result: any) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.value) {
         Swal.fire('Saved!', '', 'success')
