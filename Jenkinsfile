@@ -12,7 +12,7 @@ pipeline {
         
         stage('Deploy Back') {
             steps {
-                sh 'cd back && npm run build'
+                sh 'cd back && forever start index.js'
             }
         }
         stage('Test Back') {
