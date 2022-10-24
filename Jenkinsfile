@@ -28,7 +28,7 @@ pipeline {
         }
         stage('Deploy Front') {
             steps {
-                sh 'cd front && ng serve'
+                sh 'cd front && setsid ng serve >/dev/null 2>&1 < /dev/null &'
             }
         }
     }
