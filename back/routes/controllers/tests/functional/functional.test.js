@@ -2,7 +2,7 @@ require('../../../../config/db');
 require('dotenv').config();
 const request = require("supertest");
 const jwt = require('jsonwebtoken');
-const ap = "http://api:9090";
+const ap = "http://localhost:9090";
 // pour docker
 //   const ap = "http://api:9090";
 
