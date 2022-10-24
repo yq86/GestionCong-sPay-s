@@ -8,15 +8,14 @@ pipeline {
             steps {
                 sh 'cd back && npm install'
                 sh 'cd back && npm test'
-                sh 'cd back && npm start'
             }
         }
         
-        // stage('Test Back') {
-        //     steps {
-        //         sh 'cd back && npm test'
-        //     }
-        // }
+        stage('Test Back') {
+            steps {
+                sh 'cd back && npm start'
+            }
+        }
         
         stage('Build Front') {
             steps {
