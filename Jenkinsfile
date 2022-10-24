@@ -23,6 +23,7 @@ pipeline {
         }
         stage('Build Front') {
             steps {
+                sh 'cd front && npm install --legacy-peer-deps'
                 sh 'cd front && npm install'
             }
         }
