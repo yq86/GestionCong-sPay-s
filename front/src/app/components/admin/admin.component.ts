@@ -63,7 +63,7 @@ export class AdminComponent implements OnInit {
       confirmButtonText: 'Save',
       icon: 'warning',
 
-    } as any).then((result) => {
+    } as any).then((result: any) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.value) {
         this.userService.deleteUser(id, this.token, ).subscribe((res) => {

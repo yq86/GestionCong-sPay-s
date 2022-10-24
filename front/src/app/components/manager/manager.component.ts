@@ -63,7 +63,7 @@ export class ManagerComponent implements OnInit {
       confirmButtonText: 'Save',
       icon: 'warning',
 
-    } as any).then((result) => {
+    } as any).then((result: any) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.value) {
         this.demandeService.deleteDemande(this.token, id).subscribe((res) => {
@@ -91,7 +91,7 @@ export class ManagerComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Save',
       type: 'warning',
-    } as any).then((result) => {
+    } as any).then((result: any) => {
 
       /* Read more about isConfirmed, isDenied below */
       if (result.dismiss) {
