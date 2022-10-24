@@ -1,15 +1,25 @@
 require('../../config/db');
+require('dotenv').config();
 const { Users } = require("../../models");
 const { Holidays } = require("../../models");
 const { Demandes } = require("../../models");
 const { Types } = require("../../models");
 const { Statuses } = require("../../models");
+
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const app = express();
+
+let refreshTokens = [];
+
+
+
 // to create users
 exports.createUser = async (req, res) => {
     try{
         const user = req.body;
         await Users.create(user).then(createdUser=>{
-            res.json(createdUser); // return created user
+          //  res.status(200).send("hi"); // return created user
             const idUser = createdUser.id;
             const role = createdUser.role;
             const startingDate = createdUser.firstWorkingDay;
@@ -19,7 +29,7 @@ exports.createUser = async (req, res) => {
                 let totalConge;
                 if( new Date() >= dateWorked6months){ // if this employee has been working for more than 6 months
                     // to calculate days of congés payés
-                    totalConge = calculateCongesPayes(startingDate);    
+                    totalConge = calculateCongesPayes(startingDate);  
                 } else { // if this employee has not been working for more than 6 months
                     totalConge = 0;  // no congés payés normale available
                 }            
@@ -27,28 +37,30 @@ exports.createUser = async (req, res) => {
                     "UserId": [idUser],
                     "holidaysAvailable": totalConge,
                     "holidaysTaken": 0
-                    };
+                };
+                
                 Holidays.create(holiday); //to create this employee's paid leaves
             }    
+            res.status(200); // status object created
         });    
     } catch (error) {
         res.send(error);
-        }
+    }finally{
+    res.end();
+    }
 };
 
 // to get all the users
 exports.getAll = async (req, res) => {
     try{
         const users = await Users.findAll({ 
-            include: [ Demandes,Holidays ]
+            include: [ Demandes, Holidays ]
         });
-        if (users.length != 0) {
-            res.json(users); // to return the list of users
-        } else {
-            res.json("no user");
-        }
+        res.json(users); // to return the list of users
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -64,29 +76,61 @@ exports.getUserById = async (req, res) => {
             
                 Holidays ]
         });
-        if (user) {
-            res.json(user); 
-        } else {
-            res.json("user does not exist");
-        }
-        
+        res.json(user);  
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }    
 };
 
-// to get user by userName
-exports.getUserByUserName = async (req, res) => {
+// to get user by userName to login
+exports.userLogin = async (req, res) => {
     try{
         const userName = req.body.userName;
+        const password = req.body.password;
         const user = await Users.findOne({
-            where: {userName: [userName]},
-            include: [ Demandes, Holidays ]
-            });
-        res.json(user);
+            where: {userName: [userName], password: [password]},
+            include: [{ model: Demandes, include: [Types, Statuses] }, Holidays ]
+        });
+        if (user) {
+            const userjwt = { name: userName, role: user.role };
+            const accessToken = generateAccessToken(userjwt);
+        //    const refreshToken = jwt.sign(userjwt, process.env.REFRESH_TOKEN_SECRET);
+            res.json({userid:user.id, accesstoken: accessToken});
+        } else {
+            res.sendStatus(412); // status to imply The pre condition given in the request evaluated to false by the server.
+        }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
+};
+
+exports.userToken = async (req, res) => {
+    try{
+        const refreshToken = req.body.token;
+        if (refreshToken == null) return res.sendStatus(401);
+        if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) return res.sendStatus(403); // status access forbident
+        //    const accessToken = generateAccessToken(name: user.userName)
+        });
+    }catch (error) {
+        res.send(error);
+    }finally{
+    res.end();
+    }
+};
+
+function generateAccessToken(user) {
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '300m' });
+}
+
+exports.userLogOut = async (req, res) => {
+    refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+    res.status(204); // status no content
 };
 
 
@@ -112,9 +156,11 @@ exports.deleteUserById = async (req, res) => {
         }
         // delete this user
         await Users.destroy({where: {id: [id]}}); 
-        res.json("user and user's holidays are deleted");     
+        res.status(200);   // status request ok  
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 
 };
@@ -144,16 +190,19 @@ exports.updateUser = async (req, res) => {
                         }
                     });  
                 }
+                /*
                 const newUser = await Users.findByPk(id, {
                     include: [ Holidays]
-                });
-                res.json(newUser);
+                }); */
+                res.status(200);
             });
         } else {
-            res.json("user doesn't exist");
+            res.send(400, "user doesn't exist");
         }
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -174,9 +223,11 @@ exports.updateUserHoliday = async (req, res) => {
                 }
             });  
         }
-        res.json(holidayUpdate) ;
+        res.status(200) ;
     }catch (error) {
         res.send(error);
+    }finally{
+    res.end();
     }
 };
 
@@ -212,7 +263,7 @@ function calculateCongesPayes(startingDate){
         return totalConge;
     } catch (error) {
         res.send(error);
-    }           
+    }         
 }
 
 function updateHoliday(user, holiday){
@@ -235,5 +286,7 @@ function updateHoliday(user, holiday){
         }    
     } catch (error) {
         res.send(error);
-    }   
+    }finally{
+    res.end();
+    } 
 }
