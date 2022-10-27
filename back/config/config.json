@@ -2,21 +2,21 @@
   "development": {
     "username": "root",
     "password": "root",
-    "database": "holidayManagement",
+    "database": "holidayManagement1",
     "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
     "password": "root",
-    "database": "holidayManagement",
+    "database": "holidayManagement1",
     "host": "localhost",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
     "password": "root",
-    "database": "holidayManagement",
+    "database": "holidayManagement1",
     "host": "localhost",
     "dialect": "mysql"
   }
